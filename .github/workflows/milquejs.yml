@@ -13,6 +13,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 
 # Allow one concurrent deployment
 concurrency:
@@ -23,8 +24,6 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     env:
       MILQUE_PUBLIC_BASE_PATH: /sandbox
       NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
