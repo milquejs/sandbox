@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MILQUE_PUBLIC_BASE_PATH: /sandbox
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
