@@ -1,0 +1,32 @@
+{
+  "name": "sandbox",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A sandbox for example milque games",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/milquejs/sandbox.git"
+  },
+  "scripts": {
+    "start": "node ./build.js --dev",
+    "build": "node ./build.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier ./src/ --write"
+  },
+  "keywords": [
+    "milque"
+  ],
+  "author": "Andrew Kuo <andykuo1@duck.com>",
+  "license": "MIT",
+  "dependencies": {
+    "gl-matrix": "~3.4.3",
+    "@milquejs/milque": "~0.0.1"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "~4.2.0",
+    "esbuild": "~0.19.1",
+    "open": "^9.1.0",
+    "prettier": "~3.0.1"
+  }
+}
