@@ -34,9 +34,13 @@ async function dev() {
     outdir: SERVE_DIR,
     bundle: true,
     sourcemap: true,
+    loader: {
+      '.png': 'file',
+      '.json': 'file',
+    },
     define: {
-        'window.IS_PRODUCTION': String(Boolean(isProduction)),
-        'process.platform': JSON.stringify('browser'),
+      'window.IS_PRODUCTION': String(Boolean(isProduction)),
+      'process.platform': JSON.stringify('browser'),
     },
   };
   let ctx = await esbuild.context(opts);
@@ -65,9 +69,13 @@ async function build() {
     bundle: true,
     minify: true,
     sourcemap: true,
+    loader: {
+      '.png': 'file',
+      '.json': 'file',
+    },
     define: {
-        'window.IS_PRODUCTION': String(Boolean(isProduction)),
-        'process.platform': JSON.stringify('browser'),
+      'window.IS_PRODUCTION': String(Boolean(isProduction)),
+      'process.platform': JSON.stringify('browser'),
     },
   };
   await esbuild.build(opts);
