@@ -2,6 +2,7 @@ window.addEventListener('error', error, true);
 window.addEventListener('unhandledrejection', error, true);
 
 let errored = false;
+/** @param {ErrorEvent|PromiseRejectionEvent|Error|Event} e */
 export function error(e) {
   if (errored) {
     return;
