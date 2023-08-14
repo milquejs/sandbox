@@ -7,9 +7,15 @@ import { SystemManager } from './SystemManager';
 import { Box } from './systems/Box';
 import { Timer } from './systems/Timer';
 import { Button } from './systems/Button';
+import { Intro } from './systems/Intro';
+import { Hand } from './systems/Hand';
+import { TapButton } from './systems/TapButton';
 
 import NUMS from './assets/nums.png.asset';
 import BUTTON from './assets/button.png.asset';
+import HAND from './assets/hand.png.asset';
+import GLYPH from './assets/glyph.png.asset';
+import TAP_BUTTON from './assets/tap_button.png.asset';
 
 window.addEventListener('DOMContentLoaded', main);
 
@@ -31,6 +37,9 @@ async function main() {
   const assets = new AssetManager();
   await NUMS.load(assets);
   await BUTTON.load(assets);
+  await HAND.load(assets);
+  await GLYPH.load(assets);
+  await TAP_BUTTON.load(assets);
 
   const topics = new TopicManager();
   const ents = new EntityManager();
@@ -49,6 +58,7 @@ async function main() {
   const world = createWorld(display, inputs, assets, topics, ents, systems);
 
   const frameLoop = new AnimationFrameLoop(e => {
+    world.frame = e.detail;
     world.axb.poll(e.detail.currentTime);
 
     ents.flush();
@@ -66,6 +76,9 @@ async function main() {
   systems.register(Box, Box(world));
   systems.register(Timer, Timer(world));
   systems.register(Button, Button(world));
+  systems.register(Intro, Intro(world));
+  systems.register(Hand, Hand(world));
+  systems.register(TapButton, TapButton(world));
 
   // Start!
   frameLoop.start();
@@ -90,7 +103,7 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
   CURSOR_X.bindKeys(axb);
   CURSOR_Y.bindKeys(axb);
   CLICK.bindKeys(axb);
-  
+
   return {
     display,
     inputs,
@@ -101,5 +114,7 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
     tia,
     ctx,
     axb,
+    /** @type {import('@milquejs/milque').AnimationFrameDetail|null} */
+    frame: null,
   };
 }

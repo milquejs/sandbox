@@ -1,5 +1,8 @@
 import { WORLD_RENDER, WORLD_UPDATE } from '../index';
 import NUMS from '../assets/nums.png.asset';
+import { drawSpriteUV } from './SpriteUV';
+
+import GLYPH, { FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT } from '../assets/glyph.png.asset';
 
 /**
  * 
@@ -32,6 +35,10 @@ function onRender(world) {
   tia.matScale(4, 4);
   drawText(ctx, tia, 0, 0, String(60 - Math.floor(timer.count % 60)).padStart(2, '0'));
   tia.pop();
+
+  for(let i = 0; i < 10; ++i) {
+    drawSpriteUV(ctx, tia, GLYPH.current, i * 48 + 10, 10, i + Math.floor(timer.count * 10), FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT);
+  }
 }
 
 /**
