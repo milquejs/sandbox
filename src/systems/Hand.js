@@ -5,7 +5,7 @@ import HAND, {
   FRAME_COUNT,
 } from '../assets/hand.png.asset';
 import { lerp } from '@milquejs/milque';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 
 const HAND_OFFSET_X = -20;
 const HAND_OFFSET_Y = -20;

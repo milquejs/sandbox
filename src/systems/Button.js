@@ -1,11 +1,5 @@
 import { CLICK, CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '../index';
-import BUTTON, {
-  FRAME_WIDTH as BUTTON_WIDTH,
-  FRAME_HEIGHT as BUTTON_HEIGHT,
-  FRAME_COUNT as BUTTON_FRAME_COUNT
-} from '../assets/button.png.asset';
-import { getCurrentState, moveToState } from './Intro';
-import { Timer } from './Timer';
+import BUTTON from '../assets/button.png.asset';
 import { Wizard } from './Wizard';
 
 /**
@@ -30,7 +24,7 @@ export function Button(world) {
 function onUpdate(world) {
   let button = world.systems.get(Button);
   button.buttonX = world.display.width / 2;
-  button.buttonY = world.display.height - BUTTON_HEIGHT / 3;
+  button.buttonY = world.display.height - BUTTON.opts.spriteHeight / 3;
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
@@ -56,7 +50,7 @@ function onRender(world) {
   let index = 0;
   index = button.hover ? button.active ? 3 : 1 : 0;
 
-  drawButton(ctx, tia, button.buttonX - BUTTON_WIDTH / 2, button.buttonY - BUTTON_HEIGHT / 2, index);
+  drawButton(ctx, tia, button.buttonX - BUTTON.opts.spriteWidth / 2, button.buttonY - BUTTON.opts.spriteHeight / 2, index);
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
@@ -82,9 +76,9 @@ function onClick(world, maskId) {
  * @param {number} spriteIndex 
  */
 export function drawButton(ctx, tia, x, y, spriteIndex) {
-  let w = BUTTON_WIDTH;
-  let h = BUTTON_HEIGHT;
-  let l = BUTTON_FRAME_COUNT;
+  let w = BUTTON.opts.spriteWidth;
+  let h = BUTTON.opts.spriteHeight;
+  let l = BUTTON.opts.spriteCount;
   let i = spriteIndex % l;
   let u = i * w;
   let v = 0;
@@ -96,9 +90,9 @@ export function drawButton(ctx, tia, x, y, spriteIndex) {
  * @param {number} y
  */
 function createMask(x, y) {
-  let x1 = x - BUTTON_WIDTH / 2 + 50;
-  let y1 = y - BUTTON_HEIGHT / 2 + 20;
-  let x2 = x + BUTTON_WIDTH / 2 - 50;
-  let y2 = y + BUTTON_HEIGHT / 2 - 50;
+  let x1 = x - BUTTON.opts.spriteWidth / 2 + 50;
+  let y1 = y - BUTTON.opts.spriteHeight / 2 + 20;
+  let x2 = x + BUTTON.opts.spriteWidth / 2 - 50;
+  let y2 = y + BUTTON.opts.spriteHeight / 2 - 50;
   return [x1, y1, x2, y2];
 }

@@ -1,5 +1,5 @@
 import { Archetype, ComponentClass, Experimental, Random } from '@milquejs/milque';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 import glyphPngAsset, * as glyphPngParams from '@/assets/glyph.png.asset';
 import { CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '..';
 import { Timer, stringHash } from './Timer';

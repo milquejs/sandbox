@@ -1,5 +1,5 @@
 import { WORLD_UPDATE, WORLD_RENDER } from '../index';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 import WIZARD from '../assets/wizard.png.asset';
 import splatPngAsset from '@/assets/splat.png.asset';
 import ghostPngAsset from '@/assets/ghost.png.asset';

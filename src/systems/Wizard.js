@@ -1,5 +1,5 @@
 import wizardPngAsset, { FRAME_COUNT, FRAME_HEIGHT, FRAME_WIDTH } from '@/assets/wizard.png.asset';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 import { CLICK, CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '../index';
 import { Hand } from './Hand';
 import { Masks, createMask, updateMaskPositionFromCenter } from './Masks';

@@ -1,6 +1,6 @@
 import { ComponentClass, Query } from '@milquejs/milque';
 import { WORLD_RENDER, WORLD_UPDATE } from '..';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 import ghostPngAsset, * as ghostPngParams from '@/assets/ghost.png.asset';
 import splatPngAsset, * as splatPngParams from '@/assets/splat.png.asset';
 

@@ -4,7 +4,7 @@ import TAP_BUTTON, {
   FRAME_HEIGHT,
   FRAME_COUNT,
 } from '../assets/tap_button.png.asset';
-import { drawSpriteUV } from './SpriteUV';
+import { drawSpriteUV } from '../util/SpriteUV';
 
 /**
  * @param {import('../index.js').World} world
