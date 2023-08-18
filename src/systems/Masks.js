@@ -1,5 +1,4 @@
 /** @typedef {ReturnType<createMask>} Mask */
-
 import { WORLD_RENDER, WORLD_UPDATE } from '..';
 
 /**
@@ -10,7 +9,7 @@ export function Masks(world) {
   let list = [];
   WORLD_RENDER.on(world.topics, 0, () => {
     const { ctx, tia } = world;
-    for(let mask of list) {
+    for (let mask of list) {
       let [x1, y1, x2, y2] = mask;
       // tia.rect(ctx, x1, y1, x2, y2, 0x00FF00);
     }
@@ -23,8 +22,8 @@ export function Masks(world) {
 }
 
 /**
- * @param {import('..').World} world 
- * @param {Mask} mask 
+ * @param {import('..').World} world
+ * @param {Mask} mask
  */
 function despawnMask(world, mask) {
   const masks = world.systems.get(Masks);
@@ -37,7 +36,7 @@ function despawnMask(world, mask) {
 }
 
 /**
- * @param {import('..').World} world 
+ * @param {import('..').World} world
  * @param {Mask} mask
  */
 function spawnMask(world, mask) {
@@ -57,9 +56,9 @@ export function createMask(left, top, right, bottom) {
 
 /**
  * @param {Mask} mask
- * @param {number} x 
- * @param {number} y 
- * @param {number} dx 
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
  * @param {number} dy
  */
 export function updateMaskPositionFromCenter(mask, x, y, dx, dy) {

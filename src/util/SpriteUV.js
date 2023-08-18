@@ -1,13 +1,13 @@
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('@milquejs/milque').Experimental.Tia} tia 
- * @param {HTMLImageElement} image 
- * @param {number} x 
- * @param {number} y 
- * @param {number} spriteIndex 
- * @param {number} w 
- * @param {number} h 
- * @param {number} l 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('@milquejs/milque').Experimental.Tia} tia
+ * @param {HTMLImageElement} image
+ * @param {number} x
+ * @param {number} y
+ * @param {number} spriteIndex
+ * @param {number} w
+ * @param {number} h
+ * @param {number} l
  */
 export function drawSpriteUV(ctx, tia, image, x, y, spriteIndex, w, h, l) {
   let i = Math.floor(spriteIndex) % l;

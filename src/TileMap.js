@@ -1,8 +1,7 @@
 export class TileMap {
-  
   /**
-   * @param {number} width 
-   * @param {number} height 
+   * @param {number} width
+   * @param {number} height
    */
   constructor(width, height) {
     this.width = Math.round(width);
@@ -45,15 +44,15 @@ export class TileMap {
   }
 
   /**
-   * @param {number} fromX 
-   * @param {number} fromY 
-   * @param {number} toX 
-   * @param {number} toY 
-   * @param {number} value 
+   * @param {number} fromX
+   * @param {number} fromY
+   * @param {number} toX
+   * @param {number} toY
+   * @param {number} value
    */
   fill(fromX, fromY, toX, toY, value) {
-    for(let y = fromY; y <= toY; ++y) {
-      for(let x = fromX; x <= toX; ++x) {
+    for (let y = fromY; y <= toY; ++y) {
+      for (let x = fromX; x <= toX; ++x) {
         let i = x + y * this.width;
         this.values[i] = value;
       }
@@ -61,9 +60,7 @@ export class TileMap {
   }
 }
 
-
 export class TileMapPos {
-
   /** @param {TileMap} parent */
   constructor(parent) {
     /** @private */
@@ -168,7 +165,7 @@ export class TileMapPos {
   }
 
   /**
-   * @param {number} index 
+   * @param {number} index
    */
   fromIndex(index) {
     if (index >= 0 && index < this.parent.length) {

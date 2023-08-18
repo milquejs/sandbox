@@ -1,5 +1,11 @@
-import { CLICK, CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '../index';
 import BUTTON from '../assets/button.png.asset';
+import {
+  CLICK,
+  CURSOR_X,
+  CURSOR_Y,
+  WORLD_RENDER,
+  WORLD_UPDATE,
+} from '../index';
 import { Wizard } from './Wizard';
 
 /**
@@ -28,7 +34,7 @@ function onUpdate(world) {
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
-  
+
   button.mask = createMask(button.buttonX, button.buttonY);
   let [x1, y1, x2, y2] = button.mask;
   button.hover = Boolean(cx >= x1 && cx <= x2 && cy >= y1 && cy <= y2);
@@ -48,32 +54,36 @@ function onRender(world) {
   let button = world.systems.get(Button);
 
   let index = 0;
-  index = button.hover ? button.active ? 3 : 1 : 0;
+  index = button.hover ? (button.active ? 3 : 1) : 0;
 
-  drawButton(ctx, tia, button.buttonX - BUTTON.opts.spriteWidth / 2, button.buttonY - BUTTON.opts.spriteHeight / 2, index);
+  drawButton(
+    ctx,
+    tia,
+    button.buttonX - BUTTON.opts.spriteWidth / 2,
+    button.buttonY - BUTTON.opts.spriteHeight / 2,
+    index,
+  );
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
-  tia.circFill(ctx, cx, cy, 10, 0xFF00FF);
+  tia.circFill(ctx, cx, cy, 10, 0xff00ff);
 
   let [x1, y1, x2, y2] = button.mask;
   //tia.rect(ctx, x1, y1, x2, y2, 0x00FF00);
 }
 
 /**
- * @param {import('../index.js').World} world 
- * @param {number} maskId 
+ * @param {import('../index.js').World} world
+ * @param {number} maskId
  */
-function onClick(world, maskId) {
-  
-}
+function onClick(world, maskId) {}
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('@milquejs/milque').Experimental.Tia} tia 
- * @param {number} x 
- * @param {number} y 
- * @param {number} spriteIndex 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('@milquejs/milque').Experimental.Tia} tia
+ * @param {number} x
+ * @param {number} y
+ * @param {number} spriteIndex
  */
 export function drawButton(ctx, tia, x, y, spriteIndex) {
   let w = BUTTON.opts.spriteWidth;

@@ -17,12 +17,24 @@ export function Room(world) {
 function onRender(world) {
   const room = world.systems.get(Room);
   const { ctx, tia } = world;
-  switch(room.state) {
+  switch (room.state) {
     case 'win':
-      drawGlyph(ctx, tia, world.display.width / 2, world.display.height / 2, 'WIN');
+      drawGlyph(
+        ctx,
+        tia,
+        world.display.width / 2,
+        world.display.height / 2,
+        'WIN',
+      );
       break;
     case 'lose':
-      drawGlyph(ctx, tia, world.display.width / 2, world.display.height / 2, 'LOSE');
+      drawGlyph(
+        ctx,
+        tia,
+        world.display.width / 2,
+        world.display.height / 2,
+        'LOSE',
+      );
       break;
   }
 }

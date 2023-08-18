@@ -1,52 +1,65 @@
-import { AnimationFrameLoop, FlexCanvas, Experimental, AssetManager, InputPort, AxisBinding, KeyCodes, ButtonBinding, Topic, TopicManager, EntityManager } from '@milquejs/milque';
-import './error';
-import './reload';
+import {
+  AnimationFrameLoop,
+  AssetManager,
+  AxisBinding,
+  ButtonBinding,
+  EntityManager,
+  Experimental,
+  FlexCanvas,
+  InputPort,
+  KeyCodes,
+  Topic,
+  TopicManager,
+} from '@milquejs/milque';
 
 import { SystemManager } from './SystemManager';
-
-import { Box } from './systems/Box';
-import { Timer } from './systems/Timer';
-import { Button } from './systems/Button';
-import { Intro } from './systems/Intro';
-import { Hand } from './systems/Hand';
-import { TapButton } from './systems/TapButton';
-import { Camera } from './systems/Camera';
-import { Room } from './systems/Room';
-import { Wizard, createWizard } from './systems/Wizard';
-import { Masks } from './systems/Masks';
-import { Particles } from './systems/Particles';
-import { Spells } from './systems/Spells';
-
-import NUMS from './assets/nums.png.asset';
 import BUTTON from './assets/button.png.asset';
-import HAND from './assets/hand.png.asset';
+import ghostPngAsset from './assets/ghost.png.asset';
 import GLYPH from './assets/glyph.png.asset';
+import HAND from './assets/hand.png.asset';
+import NUMS from './assets/nums.png.asset';
+import SPLAT from './assets/splat.png.asset';
 import TAP_BUTTON from './assets/tap_button.png.asset';
 import WIZARD from './assets/wizard.png.asset';
-import SPLAT from './assets/splat.png.asset';
-import ghostPngAsset from './assets/ghost.png.asset';
+import './error';
+import './reload';
+import { Box } from './systems/Box';
+import { Button } from './systems/Button';
+import { Camera } from './systems/Camera';
+import { Hand } from './systems/Hand';
+import { Intro } from './systems/Intro';
+import { Masks } from './systems/Masks';
+import { Particles } from './systems/Particles';
+import { Room } from './systems/Room';
+import { Spells } from './systems/Spells';
+import { TapButton } from './systems/TapButton';
+import { Timer } from './systems/Timer';
+import { Wizard, createWizard } from './systems/Wizard';
 
 window.addEventListener('DOMContentLoaded', main);
 
 /**
  * What does this button do?
  * Restriction: 60 secs to win.
- * 
- * 
+ *
+ *
  * It's a rogue-like. There's a dungeon but you are the
  * hand. At the start of the game a timer starts, 60 secs.
- * 
+ *
  * You can explore the dungeon and push buttons, which does stuff.
  * Some open doors. Some start traps. Some spawn goblins.
- * 
+ *
  * But adventurers are at the door and you've been awoken.
- * 
+ *
  * It's 60 seconds until they break down the door and storm in!
  */
 
 export const CURSOR_X = new AxisBinding('cursorX', KeyCodes.MOUSE_POS_X);
 export const CURSOR_Y = new AxisBinding('cursorY', KeyCodes.MOUSE_POS_Y);
-export const CLICK = new ButtonBinding('click', [KeyCodes.MOUSE_BUTTON_0, KeyCodes.MOUSE_BUTTON_2]);
+export const CLICK = new ButtonBinding('click', [
+  KeyCodes.MOUSE_BUTTON_0,
+  KeyCodes.MOUSE_BUTTON_2,
+]);
 
 /** @type {Topic<World>} */
 export const WORLD_UPDATE = new Topic('worldUpdate');
@@ -80,7 +93,7 @@ async function main() {
 
   const world = createWorld(display, inputs, assets, topics, ents, systems);
 
-  const frameLoop = new AnimationFrameLoop(e => {
+  const frameLoop = new AnimationFrameLoop((e) => {
     world.frame = e.detail;
     world.axb.poll(e.detail.currentTime);
 
@@ -95,7 +108,6 @@ async function main() {
     topics.flush();
   });
 
-  
   // Initialize...
   systems.register(Particles, Particles(world));
   systems.register(Masks, Masks(world));
@@ -109,7 +121,7 @@ async function main() {
   systems.register(Room, Room(world));
   systems.register(Wizard, Wizard(world));
   systems.register(Spells, Spells(world));
-  
+
   // Start!
   frameLoop.start();
 }
@@ -125,7 +137,9 @@ async function main() {
  * @param {SystemManager} systems
  */
 function createWorld(display, inputs, assets, topics, ents, systems) {
-  const ctx = /** @type {CanvasRenderingContext2D} */ (display.getContext('2d'));
+  const ctx = /** @type {CanvasRenderingContext2D} */ (
+    display.getContext('2d')
+  );
   ctx.imageSmoothingEnabled = false;
   const axb = inputs.getContext('axisbutton');
   const tia = new Experimental.Tia();
@@ -151,4 +165,13 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
       deltaTime: 0,
     },
   };
+}
+
+/**
+ * @template T
+ * @param {World} m
+ * @param {import('./SystemManager').SystemFunction<T>} system
+ */
+export function use(m, system) {
+  return m.systems.get(system);
 }

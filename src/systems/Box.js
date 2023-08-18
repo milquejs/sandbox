@@ -1,13 +1,14 @@
-import { WORLD_UPDATE, WORLD_RENDER } from '../index';
-import { drawSpriteUV } from '../util/SpriteUV';
-import WIZARD from '../assets/wizard.png.asset';
-import splatPngAsset from '@/assets/splat.png.asset';
 import ghostPngAsset from '@/assets/ghost.png.asset';
+import splatPngAsset from '@/assets/splat.png.asset';
+
+import WIZARD from '../assets/wizard.png.asset';
+import { WORLD_RENDER, WORLD_UPDATE } from '../index';
+import { drawSpriteUV } from '../util/SpriteUV';
 
 export const BOX_SIZE = 64;
 
 /**
- * @param {import('../index.js').World} world 
+ * @param {import('../index.js').World} world
  */
 export function Box(world) {
   WORLD_UPDATE.on(world.topics, 0, onUpdate);

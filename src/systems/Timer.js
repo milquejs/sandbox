@@ -1,10 +1,10 @@
-import { WORLD_RENDER, WORLD_UPDATE } from '../index';
 import NUMS from '../assets/nums.png.asset';
+import { WORLD_RENDER, WORLD_UPDATE } from '../index';
 import { Room } from './Room';
 
 /**
- * 
- * @param {import('../index.js').World} world 
+ *
+ * @param {import('../index.js').World} world
  */
 export function Timer(world) {
   WORLD_UPDATE.on(world.topics, 0, onUpdate);
@@ -33,15 +33,24 @@ function onRender(world) {
 
   const halfSize = 64 / 2;
   tia.push();
-  tia.matPos(display.width / 2 - halfSize * 6, display.height / 2 - halfSize * 4);
+  tia.matPos(
+    display.width / 2 - halfSize * 6,
+    display.height / 2 - halfSize * 4,
+  );
   tia.matScale(4, 4);
-  drawText(ctx, tia, 0, 0, String(Math.max(60 - Math.floor(timer.count), 0)).padStart(2, '0'));
+  drawText(
+    ctx,
+    tia,
+    0,
+    0,
+    String(Math.max(60 - Math.floor(timer.count), 0)).padStart(2, '0'),
+  );
   tia.pop();
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('@milquejs/milque').Experimental.Tia} tia 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('@milquejs/milque').Experimental.Tia} tia
  * @param {number} x
  * @param {number} y
  * @param {string} text
@@ -52,7 +61,7 @@ export function drawText(ctx, tia, x, y, text) {
   let dx = 0;
   let dy = 0;
   text = String(text);
-  for(let pos = 0; pos < text.length; ++pos) {
+  for (let pos = 0; pos < text.length; ++pos) {
     let ch = text.charAt(pos);
     let uv = [0, 0];
     switch (ch) {
@@ -121,16 +130,14 @@ export function drawText(ctx, tia, x, y, text) {
 
 /**
  * Generates a number hash for the string. For an empty string, it will return 0.
- * 
+ *
  * @param {string} [value=''] The string to hash.
  * @returns {number} A hash that uniquely identifies the string.
  */
-export function stringHash(value='')
-{
-    let hash = 0;
-    for(let i = 0, len = value.length; i < len; i++)
-    {
-        hash = Math.imul(31, hash) + value.charCodeAt(i) | 0;
-    }
-    return hash;
+export function stringHash(value = '') {
+  let hash = 0;
+  for (let i = 0, len = value.length; i < len; i++) {
+    hash = (Math.imul(31, hash) + value.charCodeAt(i)) | 0;
+  }
+  return hash;
 }

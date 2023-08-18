@@ -4,7 +4,6 @@
  */
 
 export class SystemManager {
-
   constructor() {
     this.states = new Map();
   }

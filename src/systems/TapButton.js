@@ -1,9 +1,15 @@
-import { CLICK, CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '../index';
 import TAP_BUTTON, {
-  FRAME_WIDTH,
-  FRAME_HEIGHT,
   FRAME_COUNT,
+  FRAME_HEIGHT,
+  FRAME_WIDTH,
 } from '../assets/tap_button.png.asset';
+import {
+  CLICK,
+  CURSOR_X,
+  CURSOR_Y,
+  WORLD_RENDER,
+  WORLD_UPDATE,
+} from '../index';
 import { drawSpriteUV } from '../util/SpriteUV';
 
 /**
@@ -32,7 +38,7 @@ function onUpdate(world) {
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
-  
+
   button.mask = createMask(button.buttonX, button.buttonY);
   let [x1, y1, x2, y2] = button.mask;
   button.hover = Boolean(cx >= x1 && cx <= x2 && cy >= y1 && cy <= y2);
@@ -45,27 +51,43 @@ function onRender(world) {
   let button = world.systems.get(TapButton);
 
   let index = 0;
-  index = button.hover ? button.active ? 3 : 1 : 0;
+  index = button.hover ? (button.active ? 3 : 1) : 0;
 
-  drawButton(ctx, tia, button.buttonX - FRAME_WIDTH / 2, button.buttonY - FRAME_HEIGHT / 2, index);
+  drawButton(
+    ctx,
+    tia,
+    button.buttonX - FRAME_WIDTH / 2,
+    button.buttonY - FRAME_HEIGHT / 2,
+    index,
+  );
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
-  tia.circFill(ctx, cx, cy, 10, 0xFF00FF);
+  tia.circFill(ctx, cx, cy, 10, 0xff00ff);
 
   let [x1, y1, x2, y2] = button.mask;
   // tia.rect(ctx, x1, y1, x2, y2, 0x00FF00);
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('@milquejs/milque').Experimental.Tia} tia 
- * @param {number} x 
- * @param {number} y 
- * @param {number} spriteIndex 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('@milquejs/milque').Experimental.Tia} tia
+ * @param {number} x
+ * @param {number} y
+ * @param {number} spriteIndex
  */
 export function drawButton(ctx, tia, x, y, spriteIndex) {
-  drawSpriteUV(ctx, tia, TAP_BUTTON.current, x, y, spriteIndex, FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT);
+  drawSpriteUV(
+    ctx,
+    tia,
+    TAP_BUTTON.current,
+    x,
+    y,
+    spriteIndex,
+    FRAME_WIDTH,
+    FRAME_HEIGHT,
+    FRAME_COUNT,
+  );
 }
 
 /**

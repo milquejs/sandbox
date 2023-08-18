@@ -1,10 +1,17 @@
-import { CLICK, CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '../index';
-import HAND, {
-  FRAME_WIDTH,
-  FRAME_HEIGHT,
-  FRAME_COUNT,
-} from '../assets/hand.png.asset';
 import { lerp } from '@milquejs/milque';
+
+import HAND, {
+  FRAME_COUNT,
+  FRAME_HEIGHT,
+  FRAME_WIDTH,
+} from '../assets/hand.png.asset';
+import {
+  CLICK,
+  CURSOR_X,
+  CURSOR_Y,
+  WORLD_RENDER,
+  WORLD_UPDATE,
+} from '../index';
 import { drawSpriteUV } from '../util/SpriteUV';
 
 const HAND_OFFSET_X = -20;
@@ -29,7 +36,7 @@ export function Hand(world) {
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
 function onUpdate(world) {
-  let dt = (world.frame?.deltaTime || 0) / 60
+  let dt = (world.frame?.deltaTime || 0) / 60;
   let hand = world.systems.get(Hand);
 
   let cx = CURSOR_X.current.value * world.display.width;
@@ -55,12 +62,22 @@ function onRender(world) {
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {import('@milquejs/milque').Experimental.Tia} tia 
- * @param {number} x 
- * @param {number} y 
- * @param {number} spriteIndex 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {import('@milquejs/milque').Experimental.Tia} tia
+ * @param {number} x
+ * @param {number} y
+ * @param {number} spriteIndex
  */
 export function drawHand(ctx, tia, x, y, spriteIndex) {
-  drawSpriteUV(ctx, tia, HAND.current, x + HAND_OFFSET_X, y + HAND_OFFSET_Y, spriteIndex, FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT);
+  drawSpriteUV(
+    ctx,
+    tia,
+    HAND.current,
+    x + HAND_OFFSET_X,
+    y + HAND_OFFSET_Y,
+    spriteIndex,
+    FRAME_WIDTH,
+    FRAME_HEIGHT,
+    FRAME_COUNT,
+  );
 }

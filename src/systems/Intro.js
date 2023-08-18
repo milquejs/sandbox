@@ -1,4 +1,3 @@
-
 /**
  * @param {import('../index.js').World} world
  */
@@ -9,9 +8,9 @@ export function Intro(world) {
 }
 
 /**
- * 
- * @param {import('../index.js').World} world 
- * @param {string} nextState 
+ *
+ * @param {import('../index.js').World} world
+ * @param {string} nextState
  */
 export function moveToState(world, nextState) {
   let intro = world.systems.get(Intro);

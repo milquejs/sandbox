@@ -1,5 +1,5 @@
 // @ts-ignore
 if (!window.IS_PRODUCTION) {
-    const src = new EventSource('/esbuild');
-    src.addEventListener('change', () => location.reload());
+  const src = new EventSource('/esbuild');
+  src.addEventListener('change', () => location.reload());
 }
