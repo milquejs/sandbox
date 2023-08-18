@@ -10,18 +10,38 @@ import { Button } from './systems/Button';
 import { Intro } from './systems/Intro';
 import { Hand } from './systems/Hand';
 import { TapButton } from './systems/TapButton';
+import { Camera } from './systems/Camera';
+import { Room } from './systems/Room';
+import { Wizard, createWizard } from './systems/Wizard';
+import { Masks } from './systems/Masks';
+import { Particles } from './systems/Particles';
+import { Spells } from './systems/Spells';
 
 import NUMS from './assets/nums.png.asset';
 import BUTTON from './assets/button.png.asset';
 import HAND from './assets/hand.png.asset';
 import GLYPH from './assets/glyph.png.asset';
 import TAP_BUTTON from './assets/tap_button.png.asset';
+import WIZARD from './assets/wizard.png.asset';
+import SPLAT from './assets/splat.png.asset';
+import ghostPngAsset from './assets/ghost.png.asset';
 
 window.addEventListener('DOMContentLoaded', main);
 
 /**
  * What does this button do?
  * Restriction: 60 secs to win.
+ * 
+ * 
+ * It's a rogue-like. There's a dungeon but you are the
+ * hand. At the start of the game a timer starts, 60 secs.
+ * 
+ * You can explore the dungeon and push buttons, which does stuff.
+ * Some open doors. Some start traps. Some spawn goblins.
+ * 
+ * But adventurers are at the door and you've been awoken.
+ * 
+ * It's 60 seconds until they break down the door and storm in!
  */
 
 export const CURSOR_X = new AxisBinding('cursorX', KeyCodes.MOUSE_POS_X);
@@ -40,6 +60,9 @@ async function main() {
   await HAND.load(assets);
   await GLYPH.load(assets);
   await TAP_BUTTON.load(assets);
+  await WIZARD.load(assets);
+  await SPLAT.load(assets);
+  await ghostPngAsset.load(assets);
 
   const topics = new TopicManager();
   const ents = new EntityManager();
@@ -72,14 +95,21 @@ async function main() {
     topics.flush();
   });
 
+  
   // Initialize...
+  systems.register(Particles, Particles(world));
+  systems.register(Masks, Masks(world));
   systems.register(Box, Box(world));
   systems.register(Timer, Timer(world));
   systems.register(Button, Button(world));
   systems.register(Intro, Intro(world));
   systems.register(Hand, Hand(world));
   systems.register(TapButton, TapButton(world));
-
+  systems.register(Camera, new Camera(world));
+  systems.register(Room, Room(world));
+  systems.register(Wizard, Wizard(world));
+  systems.register(Spells, Spells(world));
+  
   // Start!
   frameLoop.start();
 }
@@ -114,7 +144,11 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
     tia,
     ctx,
     axb,
-    /** @type {import('@milquejs/milque').AnimationFrameDetail|null} */
-    frame: null,
+    /** @type {import('@milquejs/milque').AnimationFrameDetail} */
+    frame: {
+      prevTime: 0,
+      currentTime: 0,
+      deltaTime: 0,
+    },
   };
 }

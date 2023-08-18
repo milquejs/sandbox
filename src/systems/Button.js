@@ -5,6 +5,8 @@ import BUTTON, {
   FRAME_COUNT as BUTTON_FRAME_COUNT
 } from '../assets/button.png.asset';
 import { getCurrentState, moveToState } from './Intro';
+import { Timer } from './Timer';
+import { Wizard } from './Wizard';
 
 /**
  * @param {import('../index.js').World} world
@@ -28,7 +30,7 @@ export function Button(world) {
 function onUpdate(world) {
   let button = world.systems.get(Button);
   button.buttonX = world.display.width / 2;
-  button.buttonY = world.display.height / 2 + BUTTON_HEIGHT / 3;
+  button.buttonY = world.display.height - BUTTON_HEIGHT / 3;
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;
@@ -41,9 +43,8 @@ function onUpdate(world) {
 
   // Still hovering, but has finished clicking!
   if (button.hover && !button.active && prevActive) {
-    if (getCurrentState(world) === 'button') {
-      moveToState(world, 'timeStart');
-    }
+    const wizards = world.systems.get(Wizard);
+    wizards.spawnTimer = 0;
   }
 }
 

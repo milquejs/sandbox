@@ -27,8 +27,8 @@ export function TapButton(world) {
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
 function onUpdate(world) {
   let button = world.systems.get(TapButton);
-  button.buttonX = 64;
-  button.buttonY = 64;
+  button.buttonX = world.display.width / 2;
+  button.buttonY = 32;
 
   let cx = CURSOR_X.current.value * world.display.width;
   let cy = CURSOR_Y.current.value * world.display.height;

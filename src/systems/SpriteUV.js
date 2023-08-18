@@ -10,7 +10,7 @@
  * @param {number} l 
  */
 export function drawSpriteUV(ctx, tia, image, x, y, spriteIndex, w, h, l) {
-  let i = spriteIndex % l;
+  let i = Math.floor(spriteIndex) % l;
   let u = i * w;
   let v = 0;
   tia.sprUV(ctx, image, u, v, u + w, v + h, x, y, w, h);

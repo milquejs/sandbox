@@ -1,6 +1,6 @@
 /**
  * @template T
- * @typedef {(...args: any) => T} SystemFunction
+ * @typedef {{ (...args: any[]): T } | { new (...args: any[]): T }} SystemFunction
  */
 
 export class SystemManager {
@@ -11,8 +11,8 @@ export class SystemManager {
 
   /**
    * @template T
-   * @param {SystemFunction<T>|string|symbol} handle 
-   * @param {T} [initialState] 
+   * @param {SystemFunction<T>|string|symbol} handle
+   * @param {T} [initialState]
    */
   register(handle, initialState = undefined) {
     this.states.set(handle, initialState || {});
@@ -20,7 +20,7 @@ export class SystemManager {
 
   /**
    * @template T
-   * @param {SystemFunction<T>|string|symbol} handle 
+   * @param {SystemFunction<T>|string|symbol} handle
    * @returns {T}
    */
   get(handle) {

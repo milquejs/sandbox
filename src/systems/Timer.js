@@ -1,8 +1,6 @@
 import { WORLD_RENDER, WORLD_UPDATE } from '../index';
 import NUMS from '../assets/nums.png.asset';
-import { drawSpriteUV } from './SpriteUV';
-
-import GLYPH, { FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT } from '../assets/glyph.png.asset';
+import { Room } from './Room';
 
 /**
  * 
@@ -22,6 +20,10 @@ export function Timer(world) {
 function onUpdate(world) {
   let timer = world.systems.get(Timer);
   timer.count += 0.01;
+  if (timer.count > 60) {
+    const room = world.systems.get(Room);
+    room.state = 'lose';
+  }
 }
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
@@ -33,12 +35,8 @@ function onRender(world) {
   tia.push();
   tia.matPos(display.width / 2 - halfSize * 6, display.height / 2 - halfSize * 4);
   tia.matScale(4, 4);
-  drawText(ctx, tia, 0, 0, String(60 - Math.floor(timer.count % 60)).padStart(2, '0'));
+  drawText(ctx, tia, 0, 0, String(Math.max(60 - Math.floor(timer.count), 0)).padStart(2, '0'));
   tia.pop();
-
-  for(let i = 0; i < 10; ++i) {
-    drawSpriteUV(ctx, tia, GLYPH.current, i * 48 + 10, 10, i + Math.floor(timer.count * 10), FRAME_WIDTH, FRAME_HEIGHT, FRAME_COUNT);
-  }
 }
 
 /**
@@ -109,7 +107,9 @@ export function drawText(ctx, tia, x, y, text) {
         continue;
       case '0':
       default:
-        uv = [0, 0];
+        let i = Math.abs(stringHash(ch + 'fancy') % 4);
+        let j = Math.abs(stringHash(ch + 'regal') % 4);
+        uv = [i, j];
         break;
     }
     let du = uv[0] * w;
@@ -117,4 +117,20 @@ export function drawText(ctx, tia, x, y, text) {
     tia.sprUV(ctx, NUMS.current, du, dv, du + w, dv + h, x + dx, y + dy, w, h);
     dx += Math.floor(w * 0.66);
   }
+}
+
+/**
+ * Generates a number hash for the string. For an empty string, it will return 0.
+ * 
+ * @param {string} [value=''] The string to hash.
+ * @returns {number} A hash that uniquely identifies the string.
+ */
+export function stringHash(value='')
+{
+    let hash = 0;
+    for(let i = 0, len = value.length; i < len; i++)
+    {
+        hash = Math.imul(31, hash) + value.charCodeAt(i) | 0;
+    }
+    return hash;
 }

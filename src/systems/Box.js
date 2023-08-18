@@ -1,4 +1,8 @@
 import { WORLD_UPDATE, WORLD_RENDER } from '../index';
+import { drawSpriteUV } from './SpriteUV';
+import WIZARD from '../assets/wizard.png.asset';
+import splatPngAsset from '@/assets/splat.png.asset';
+import ghostPngAsset from '@/assets/ghost.png.asset';
 
 export const BOX_SIZE = 64;
 
@@ -38,5 +42,10 @@ function onUpdate(world) {
 function onRender(world) {
   const { ctx, tia } = world;
   const box = world.systems.get(Box);
-  tia.rectFill(ctx, box.x - BOX_SIZE / 2, box.y - BOX_SIZE / 2, box.x + BOX_SIZE / 2, box.y + BOX_SIZE / 2, 0xFF0000);
+  // tia.rectFill(ctx, box.x - BOX_SIZE / 2, box.y - BOX_SIZE / 2, box.x + BOX_SIZE / 2, box.y + BOX_SIZE / 2, 0xFF0000);
+
+  let dt = Math.floor(world.frame?.currentTime / 100);
+  // drawSpriteUV(ctx, tia, WIZARD.current, 100, 100, dt % 3, 64, 64, 3);
+  // drawSpriteUV(ctx, tia, splatPngAsset.current, 100, 100, dt % 6, 80, 80, 6);
+  // drawSpriteUV(ctx, tia, ghostPngAsset.current, 100, 100 - ((dt % 12) * 10), dt % 12, 32, 80, 12);
 }
