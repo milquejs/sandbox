@@ -3,7 +3,6 @@ import { WORLD_RENDER, WORLD_UPDATE } from '../index';
 import { Room } from './Room';
 
 /**
- *
  * @param {import('../index.js').World} world
  */
 export function Timer(world) {

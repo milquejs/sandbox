@@ -1,24 +1,31 @@
 /** @typedef {ReturnType<createMask>} Mask */
-import { WORLD_RENDER, WORLD_UPDATE } from '..';
+import { WORLD_RENDER, use } from '..';
+
+export class Masks {
+  /** @type {Array<Mask>} */
+  list = [];
+  spawnMask = spawnMask;
+  despawnMask = despawnMask;
+  onRender = onRender.bind(this);
+
+  /**
+   * @param {import('..').World} m
+   */
+  constructor(m) {
+    WORLD_RENDER.on(m.topics, 0, onRender);
+  }
+}
 
 /**
- * @param {import('..').World} world
+ * @param {import('..').World} m
  */
-export function Masks(world) {
-  /** @type {Array<Mask>} */
-  let list = [];
-  WORLD_RENDER.on(world.topics, 0, () => {
-    const { ctx, tia } = world;
-    for (let mask of list) {
-      let [x1, y1, x2, y2] = mask;
-      // tia.rect(ctx, x1, y1, x2, y2, 0x00FF00);
-    }
-  });
-  return {
-    list,
-    spawnMask,
-    despawnMask,
-  };
+function onRender(m) {
+  const masks = use(m, Masks);
+  const { ctx, tia } = m;
+  for (let mask of masks.list) {
+    let [x1, y1, x2, y2] = mask;
+    tia.rect(ctx, x1, y1, x2, y2, 0x00ff00);
+  }
 }
 
 /**

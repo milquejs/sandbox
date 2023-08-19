@@ -31,10 +31,11 @@ import { Intro } from './systems/Intro';
 import { Masks } from './systems/Masks';
 import { Particles } from './systems/Particles';
 import { Room } from './systems/Room';
+import { Skellies } from './systems/Skelly';
 import { Spells } from './systems/Spells';
 import { TapButton } from './systems/TapButton';
 import { Timer } from './systems/Timer';
-import { Wizard, createWizard } from './systems/Wizard';
+import { Wizard } from './systems/Wizard';
 
 window.addEventListener('DOMContentLoaded', main);
 
@@ -110,7 +111,7 @@ async function main() {
 
   // Initialize...
   systems.register(Particles, Particles(world));
-  systems.register(Masks, Masks(world));
+  systems.register(Masks, new Masks(world));
   systems.register(Box, Box(world));
   systems.register(Timer, Timer(world));
   systems.register(Button, Button(world));
@@ -121,6 +122,7 @@ async function main() {
   systems.register(Room, Room(world));
   systems.register(Wizard, Wizard(world));
   systems.register(Spells, Spells(world));
+  systems.register(Skellies, Skellies(world));
 
   // Start!
   frameLoop.start();
@@ -174,4 +176,16 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
  */
 export function use(m, system) {
   return m.systems.get(system);
+}
+
+/**
+ * @template T
+ * @param {World} m
+ * @param {Topic<T>} topic
+ * @param {number} priority
+ * @param {import('@milquejs/milque').TopicCallback<T>} callback
+ * @returns
+ */
+export function when(m, topic, priority, callback) {
+  return topic.on(m.topics, priority, callback);
 }

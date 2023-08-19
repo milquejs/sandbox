@@ -42,6 +42,7 @@ async function dev() {
       'window.IS_PRODUCTION': String(Boolean(isProduction)),
       'process.platform': JSON.stringify('browser'),
     },
+    plugins: []
   };
   let ctx = await esbuild.context(opts);
   await ctx.watch();
@@ -77,6 +78,7 @@ async function build() {
       'window.IS_PRODUCTION': String(Boolean(isProduction)),
       'process.platform': JSON.stringify('browser'),
     },
+    plugins: []
   };
   await esbuild.build(opts);
 }
