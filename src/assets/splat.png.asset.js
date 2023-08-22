@@ -5,7 +5,12 @@ import FILEPATH from './splat.png';
 export default new AssetRef(
   'splat.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 80,
+    spriteHeight: 80,
+    spriteCount: 6,
+  },
   FILEPATH,
 );
 

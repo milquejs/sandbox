@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-import * as esbuild from 'esbuild';
 import open from 'open';
+import * as esbuild from 'esbuild';
 
 const OUT_DIR = path.resolve('./dist');
 const SERVE_DIR = path.resolve('./build');
@@ -9,6 +9,9 @@ const ENTRY_POINTS = [
   './src/index.js',
 ];
 
+/**
+ * @param {Array<string>} args 
+ */
 async function main(args) {
   if (args.includes('--dev')) {
     await dev();
@@ -36,7 +39,7 @@ async function dev() {
     sourcemap: true,
     loader: {
       '.png': 'file',
-      '.json': 'file',
+      '.json': 'json',
     },
     define: {
       'window.IS_PRODUCTION': String(Boolean(isProduction)),

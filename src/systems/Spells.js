@@ -7,7 +7,7 @@ import {
 
 import glyphPngAsset, * as glyphPngParams from '@/assets/glyph.png.asset';
 
-import { CURSOR_X, CURSOR_Y, WORLD_RENDER, WORLD_UPDATE } from '..';
+import { CURSOR_X, CURSOR_Y, WORLD_LOAD, WORLD_RENDER, WORLD_UPDATE } from '..';
 import { drawSpriteUV } from '../util/SpriteUV';
 import { Masks, createMask, updateMaskPositionFromCenter } from './Masks';
 import { Particles } from './Particles';
@@ -27,12 +27,20 @@ export const SpellArchetype = new Archetype({ spell: SpellComponent });
  * @param {import('..').World} world
  */
 export function Spells(world) {
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, updateSpells);
   WORLD_RENDER.on(world.topics, 0, renderSpells);
   return {
     spawnSpell,
     despawnSpell,
   };
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await glyphPngAsset.load(m.assets);
 }
 
 /**
@@ -122,12 +130,16 @@ function renderSpells(world) {
  * @param {string} text
  */
 export function drawGlyph(ctx, tia, x, y, text) {
+  let g = glyphPngAsset.current;
+  if (!g) {
+    throw new Error('Missing glyph asset.');
+  }
   for (let dx = -text.length / 2; dx <= text.length / 2; ++dx) {
     let i = Math.abs(stringHash(text + 'fancy') % glyphPngParams.FRAME_COUNT);
     drawSpriteUV(
       ctx,
       tia,
-      glyphPngAsset.current,
+      g,
       x - glyphPngParams.FRAME_WIDTH / 2 + dx * glyphPngParams.FRAME_WIDTH,
       y - glyphPngParams.FRAME_HEIGHT / 2,
       i,

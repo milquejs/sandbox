@@ -3,7 +3,7 @@ import { ComponentClass, Query } from '@milquejs/milque';
 import ghostPngAsset, * as ghostPngParams from '@/assets/ghost.png.asset';
 import splatPngAsset, * as splatPngParams from '@/assets/splat.png.asset';
 
-import { WORLD_RENDER, WORLD_UPDATE } from '..';
+import { WORLD_LOAD, WORLD_RENDER, WORLD_UPDATE } from '..';
 import { drawSpriteUV } from '../util/SpriteUV';
 
 const ParticleClass = new ComponentClass('particle', () => ({
@@ -25,12 +25,21 @@ const ParticleQuery = new Query(ParticleClass);
  * @param {import('..').World} world
  */
 export function Particles(world) {
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, updateParticles);
   WORLD_RENDER.on(world.topics, 0, renderParticles);
   return {
     spawnParticle,
     despawnParticle,
   };
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await ghostPngAsset.load(m.assets);
+  await splatPngAsset.load(m.assets);
 }
 
 /**
@@ -99,10 +108,14 @@ function renderParticle(world, particle) {
   let energyRatio = particle.energy / particle.initial;
   switch (particle.renderType) {
     case 'ghost':
+      let g = ghostPngAsset.current;
+      if (!g) {
+        throw new Error('Missing ghost asset.');
+      }
       drawSpriteUV(
         ctx,
         tia,
-        ghostPngAsset.current,
+        g,
         particle.x - ghostPngParams.FRAME_WIDTH / 2,
         particle.y - ghostPngParams.FRAME_HEIGHT / 2,
         Math.floor((1 - energyRatio) * ghostPngParams.FRAME_COUNT),
@@ -112,10 +125,14 @@ function renderParticle(world, particle) {
       );
       break;
     case 'splat':
+      let s = splatPngAsset.current;
+      if (!s) {
+        throw new Error('Missing splat asset.');
+      }
       drawSpriteUV(
         ctx,
         tia,
-        splatPngAsset.current,
+        s,
         particle.x - splatPngParams.FRAME_WIDTH / 2,
         particle.y - splatPngParams.FRAME_HEIGHT / 2,
         Math.floor((1 - energyRatio) * splatPngParams.FRAME_COUNT),

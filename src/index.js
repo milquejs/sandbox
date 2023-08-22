@@ -1,6 +1,7 @@
 import {
   AnimationFrameLoop,
   AssetManager,
+  AsyncTopic,
   AxisBinding,
   ButtonBinding,
   EntityManager,
@@ -13,14 +14,7 @@ import {
 } from '@milquejs/milque';
 
 import { SystemManager } from './SystemManager';
-import BUTTON from './assets/button.png.asset';
-import ghostPngAsset from './assets/ghost.png.asset';
-import GLYPH from './assets/glyph.png.asset';
-import HAND from './assets/hand.png.asset';
-import NUMS from './assets/nums.png.asset';
-import SPLAT from './assets/splat.png.asset';
-import TAP_BUTTON from './assets/tap_button.png.asset';
-import WIZARD from './assets/wizard.png.asset';
+
 import './error';
 import './reload';
 import { Box } from './systems/Box';
@@ -36,6 +30,8 @@ import { Spells } from './systems/Spells';
 import { TapButton } from './systems/TapButton';
 import { Timer } from './systems/Timer';
 import { Wizard } from './systems/Wizard';
+
+FlexCanvas.define();
 
 window.addEventListener('DOMContentLoaded', main);
 
@@ -62,96 +58,70 @@ export const CLICK = new ButtonBinding('click', [
   KeyCodes.MOUSE_BUTTON_2,
 ]);
 
+/** @type {AsyncTopic<World>} */
+export const WORLD_LOAD = new AsyncTopic('worldLoad');
 /** @type {Topic<World>} */
 export const WORLD_UPDATE = new Topic('worldUpdate');
 /** @type {Topic<World>} */
 export const WORLD_RENDER = new Topic('worldRender');
 
 async function main() {
-  const assets = new AssetManager();
-  await NUMS.load(assets);
-  await BUTTON.load(assets);
-  await HAND.load(assets);
-  await GLYPH.load(assets);
-  await TAP_BUTTON.load(assets);
-  await WIZARD.load(assets);
-  await SPLAT.load(assets);
-  await ghostPngAsset.load(assets);
+  const world = createWorld();
 
-  const topics = new TopicManager();
-  const ents = new EntityManager();
-  const systems = new SystemManager();
-
-  const display = FlexCanvas.create({
-    id: 'display',
-    sizing: 'viewport',
-    scaling: 'scale',
-    width: 600,
-    height: 400,
-  });
-  const inputs = InputPort.create({ for: 'display' });
-  inputs.style.display = 'none';
-
-  const world = createWorld(display, inputs, assets, topics, ents, systems);
-
-  const frameLoop = new AnimationFrameLoop((e) => {
-    world.frame = e.detail;
-    world.axb.poll(e.detail.currentTime);
-
-    ents.flush();
-    topics.dispatchImmediately(WORLD_UPDATE, world);
-
-    const { ctx, display, tia } = world;
-    tia.camera(0, 0, display.width, display.height);
-    tia.cls(ctx, 0x333333);
-    topics.dispatchImmediately(WORLD_RENDER, world);
-
-    topics.flush();
-  });
-
-  // Initialize...
-  systems.register(Particles, Particles(world));
-  systems.register(Masks, new Masks(world));
-  systems.register(Box, Box(world));
-  systems.register(Timer, Timer(world));
-  systems.register(Button, Button(world));
-  systems.register(Intro, Intro(world));
-  systems.register(Hand, Hand(world));
-  systems.register(TapButton, TapButton(world));
-  systems.register(Camera, new Camera(world));
-  systems.register(Room, Room(world));
-  systems.register(Wizard, Wizard(world));
-  systems.register(Spells, Spells(world));
-  systems.register(Skellies, Skellies(world));
-
-  // Start!
-  frameLoop.start();
-}
-
-/** @typedef {ReturnType<createWorld>} World */
-
-/**
- * @param {FlexCanvas} display
- * @param {InputPort} inputs
- * @param {AssetManager} assets
- * @param {TopicManager} topics
- * @param {EntityManager} ents
- * @param {SystemManager} systems
- */
-function createWorld(display, inputs, assets, topics, ents, systems) {
-  const ctx = /** @type {CanvasRenderingContext2D} */ (
-    display.getContext('2d')
-  );
-  ctx.imageSmoothingEnabled = false;
-  const axb = inputs.getContext('axisbutton');
-  const tia = new Experimental.Tia();
-
+  const { axb } = world;
   CURSOR_X.bindKeys(axb);
   CURSOR_Y.bindKeys(axb);
   CLICK.bindKeys(axb);
 
-  return {
+  // Initialize...
+  world.systems.register(Particles, Particles(world));
+  world.systems.register(Particles, Particles(world));
+  world.systems.register(Masks, new Masks(world));
+  world.systems.register(Box, Box(world));
+  world.systems.register(Timer, Timer(world));
+  world.systems.register(Button, new Button(world));
+  world.systems.register(Intro, Intro(world));
+  world.systems.register(Hand, Hand(world));
+  world.systems.register(TapButton, TapButton(world));
+  world.systems.register(Camera, new Camera(world));
+  world.systems.register(Room, Room(world));
+  world.systems.register(Wizard, Wizard(world));
+  world.systems.register(Spells, Spells(world));
+  world.systems.register(Skellies, Skellies(world));
+
+  await WORLD_LOAD.dispatchImmediately(world.topics, world);
+
+  // Start!
+  world.loop.start();
+}
+
+/** @typedef {ReturnType<createWorld>} World */
+
+function createWorld() {
+  const assets = new AssetManager();
+  const topics = new TopicManager();
+  const ents = new EntityManager();
+  const systems = new SystemManager();
+
+  const display = new FlexCanvas({
+    root: document.body,
+    sizing: 'viewport',
+    width: 600,
+    height: 400,
+    aspectRatio: 600 / 400,
+  });
+  display.id = 'display';
+  const inputs = InputPort.create({ for: 'display' });
+  inputs.style.display = 'none';
+
+  const ctx = display.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const axb = inputs.getContext('axisbutton');
+  const tia = new Experimental.Tia();
+
+  let result = {
     display,
+    canvas: display,
     inputs,
     assets,
     topics,
@@ -166,7 +136,23 @@ function createWorld(display, inputs, assets, topics, ents, systems) {
       currentTime: 0,
       deltaTime: 0,
     },
+    loop: new AnimationFrameLoop((e) => {
+      result.frame = e.detail;
+      result.axb.poll(e.detail.currentTime);
+
+      ents.flush();
+      topics.dispatchImmediately(WORLD_UPDATE, result);
+
+      const { ctx, tia } = result;
+      tia.camera(0, 0);
+      tia.cls(ctx, 0x333333);
+      topics.dispatchImmediately(WORLD_RENDER, result);
+
+      topics.flush();
+    }),
   };
+  
+  return result;
 }
 
 /**

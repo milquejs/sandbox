@@ -4,6 +4,6 @@ declare module '*.png' {
 }
 
 declare module '*.json' {
-  const url: string;
-  export default url;
+  const data: object;
+  export default data;
 }

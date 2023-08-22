@@ -5,7 +5,12 @@ import FILEPATH from './wizard.png';
 export default new AssetRef(
   'wizard.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 64,
+    spriteHeight: 64,
+    spriteCount: 3,
+  },
   FILEPATH,
 );
 

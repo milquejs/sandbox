@@ -3,27 +3,34 @@ import {
   CLICK,
   CURSOR_X,
   CURSOR_Y,
+  WORLD_LOAD,
   WORLD_RENDER,
   WORLD_UPDATE,
 } from '../index';
 import { Wizard } from './Wizard';
 
-/**
- * @param {import('../index.js').World} world
- */
-export function Button(world) {
-  WORLD_UPDATE.on(world.topics, 0, onUpdate);
-  WORLD_RENDER.on(world.topics, 0, onRender);
+export class Button {
+  buttonX = 0;
+  buttonY = 0;
+  mask = createMask(0, 0);
+  hover = false;
+  active = false;
 
-  let buttonX = 0;
-  let buttonY = 0;
-  return {
-    buttonX,
-    buttonY,
-    mask: createMask(0, 0),
-    hover: false,
-    active: false,
-  };
+  /**
+   * @param {import('../index.js').World} m
+   */
+  constructor(m) {
+    WORLD_LOAD.on(m.topics, 0, onLoad);
+    WORLD_UPDATE.on(m.topics, 0, onUpdate);
+    WORLD_RENDER.on(m.topics, 0, onRender);
+  }
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await BUTTON.load(m.assets);
 }
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
@@ -89,10 +96,14 @@ export function drawButton(ctx, tia, x, y, spriteIndex) {
   let w = BUTTON.opts.spriteWidth;
   let h = BUTTON.opts.spriteHeight;
   let l = BUTTON.opts.spriteCount;
+  let a = BUTTON.current;
   let i = spriteIndex % l;
   let u = i * w;
   let v = 0;
-  tia.sprUV(ctx, BUTTON.current, u, v, u + w, v + h, x, y, w, h);
+  if (!a) {
+    throw new Error('Missing button asset.');
+  }
+  tia.sprUV(ctx, a, u, v, u + w, v + h, x, y, w, h);
 }
 
 /**

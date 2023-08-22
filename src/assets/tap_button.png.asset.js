@@ -5,7 +5,12 @@ import FILEPATH from './tap_button.png';
 export default new AssetRef(
   'tap_button.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 128,
+    spriteHeight: 128,
+    spriteCount: 4,
+  },
   FILEPATH,
 );
 

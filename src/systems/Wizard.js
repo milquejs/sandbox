@@ -11,6 +11,7 @@ import {
   CLICK,
   CURSOR_X,
   CURSOR_Y,
+  WORLD_LOAD,
   WORLD_RENDER,
   WORLD_UPDATE,
 } from '../index';
@@ -42,6 +43,7 @@ export function Wizard(world) {
   let spawnTimer = 0;
   let maxSpawnTimer = 1000;
 
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, () => {
     const room = world.systems.get(Room);
     const wizards = world.systems.get(Wizard);
@@ -84,6 +86,13 @@ export function Wizard(world) {
     spawnWizard,
     despawnWizard,
   };
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await wizardPngAsset.load(m.assets);
 }
 
 export function createWizard() {
@@ -175,10 +184,14 @@ function updateWizard(world, wizard) {
  */
 function renderWizard(world, wizard) {
   const { ctx, tia } = world;
+  let w = wizardPngAsset.current;
+  if (!w) {
+    throw new Error('Missing wizard asset.');
+  }
   drawSpriteUV(
     ctx,
     tia,
-    wizardPngAsset.current,
+    w,
     wizard.x - FRAME_WIDTH / 2,
     wizard.y - FRAME_HEIGHT / 2,
     wizard.spriteIndex,

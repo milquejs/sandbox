@@ -7,6 +7,7 @@ import {
   CLICK,
   CURSOR_X,
   CURSOR_Y,
+  WORLD_LOAD,
   WORLD_RENDER,
   WORLD_UPDATE,
 } from '../index';
@@ -16,6 +17,7 @@ import { drawSpriteUV } from '../util/SpriteUV';
  * @param {import('../index.js').World} world
  */
 export function TapButton(world) {
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, onUpdate);
   WORLD_RENDER.on(world.topics, 0, onRender);
 
@@ -28,6 +30,13 @@ export function TapButton(world) {
     hover: false,
     active: false,
   };
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await TAP_BUTTON.load(m.assets);
 }
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
@@ -77,10 +86,14 @@ function onRender(world) {
  * @param {number} spriteIndex
  */
 export function drawButton(ctx, tia, x, y, spriteIndex) {
+  let t = TAP_BUTTON.current;
+  if (!t) {
+    throw new Error('Missing tap button asset.');
+  }
   drawSpriteUV(
     ctx,
     tia,
-    TAP_BUTTON.current,
+    t,
     x,
     y,
     spriteIndex,

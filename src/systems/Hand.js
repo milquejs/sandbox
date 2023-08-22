@@ -9,6 +9,7 @@ import {
   CLICK,
   CURSOR_X,
   CURSOR_Y,
+  WORLD_LOAD,
   WORLD_RENDER,
   WORLD_UPDATE,
 } from '../index';
@@ -21,6 +22,7 @@ const HAND_OFFSET_Y = -20;
  * @param {import('../index.js').World} world
  */
 export function Hand(world) {
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, onUpdate);
   WORLD_RENDER.on(world.topics, 1, onRender);
 
@@ -32,6 +34,13 @@ export function Hand(world) {
     armX: 0,
     armY: 0,
   };
+}
+
+/**
+ * @param {import('..').World} m 
+ */
+async function onLoad(m) {
+  await HAND.load(m.assets);
 }
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
@@ -69,10 +78,14 @@ function onRender(world) {
  * @param {number} spriteIndex
  */
 export function drawHand(ctx, tia, x, y, spriteIndex) {
+  let a = HAND.current;
+  if (!a) {
+    throw new Error('Missing hand asset.');
+  }
   drawSpriteUV(
     ctx,
     tia,
-    HAND.current,
+    a,
     x + HAND_OFFSET_X,
     y + HAND_OFFSET_Y,
     spriteIndex,

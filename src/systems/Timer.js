@@ -1,11 +1,12 @@
 import NUMS from '../assets/nums.png.asset';
-import { WORLD_RENDER, WORLD_UPDATE } from '../index';
+import { WORLD_LOAD, WORLD_RENDER, WORLD_UPDATE } from '../index';
 import { Room } from './Room';
 
 /**
  * @param {import('../index.js').World} world
  */
 export function Timer(world) {
+  WORLD_LOAD.on(world.topics, 0, onLoad);
   WORLD_UPDATE.on(world.topics, 0, onUpdate);
   WORLD_RENDER.on(world.topics, 0, onRender);
 
@@ -13,6 +14,13 @@ export function Timer(world) {
   return {
     count,
   };
+}
+
+/**
+ * @param {import('../index').World} m 
+ */
+async function onLoad(m) {
+  await NUMS.load(m.assets);
 }
 
 /** @type {import('@milquejs/milque').TopicCallback<import('../index.js').World>} */
@@ -59,6 +67,10 @@ export function drawText(ctx, tia, x, y, text) {
   const h = 64;
   let dx = 0;
   let dy = 0;
+  let n = NUMS.current;
+  if (!n) {
+    throw new Error('Missing nums asset.');
+  }
   text = String(text);
   for (let pos = 0; pos < text.length; ++pos) {
     let ch = text.charAt(pos);
@@ -122,7 +134,7 @@ export function drawText(ctx, tia, x, y, text) {
     }
     let du = uv[0] * w;
     let dv = uv[1] * h;
-    tia.sprUV(ctx, NUMS.current, du, dv, du + w, dv + h, x + dx, y + dy, w, h);
+    tia.sprUV(ctx, n, du, dv, du + w, dv + h, x + dx, y + dy, w, h);
     dx += Math.floor(w * 0.66);
   }
 }

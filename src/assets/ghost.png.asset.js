@@ -5,7 +5,12 @@ import FILEPATH from './ghost.png';
 export default new AssetRef(
   'ghost.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 32,
+    spriteHeight: 80,
+    spriteCount: 12,
+  },
   FILEPATH,
 );
 

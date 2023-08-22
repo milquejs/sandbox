@@ -5,7 +5,12 @@ import FILEPATH from './glyph.png';
 export default new AssetRef(
   'glyph.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 48,
+    spriteHeight: 48,
+    spriteCount: 10,
+  },
   FILEPATH,
 );
 

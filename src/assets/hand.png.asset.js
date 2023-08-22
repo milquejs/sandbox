@@ -5,7 +5,12 @@ import FILEPATH from './hand.png';
 export default new AssetRef(
   'hand.png',
   ImageLoader,
-  { imageType: 'png' },
+  {
+    imageType: 'png',
+    spriteWidth: 512,
+    spriteHeight: 512,
+    spriteCount: 3,
+  },
   FILEPATH,
 );
 
