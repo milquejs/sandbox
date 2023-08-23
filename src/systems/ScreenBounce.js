@@ -3,9 +3,6 @@ import { ComponentClass, Query, Topic } from '@milquejs/milque';
 import { Position } from './Position';
 import { Velocity } from './Velocity';
 import { useProvider } from '../main';
-import { FrameProvider } from './FrameProvider';
-
-export const ScreenBounce = new ComponentClass('screenBounce');
 
 /** @type {Topic<ScreenBounceEvent>} */
 export const ScreenBounceTopic = new Topic('screenBounce.bounce');
@@ -21,6 +18,7 @@ export class ScreenBounceConfiguration {
   maxScreenY = 90;
 }
 
+export const ScreenBounce = new ComponentClass('screenBounce');
 const UpdateScreenBounceQuery = new Query(ScreenBounce, Position, Velocity);
 
 /**
@@ -28,7 +26,6 @@ const UpdateScreenBounceQuery = new Query(ScreenBounce, Position, Velocity);
  */
 export function ScreenBounceSystem(m) {
   const { maxScreenX, maxScreenY, minScreenX, minScreenY } = useProvider(m, ScreenBounceConfiguration);
-  const { topics } = useProvider(m, FrameProvider);
 
   for(let entityId of UpdateScreenBounceQuery.findEntityIds(m.ents)) {
     let position = m.ents.get(entityId, Position);
@@ -52,7 +49,7 @@ export function ScreenBounceSystem(m) {
     if (flag) {
       let e = new ScreenBounceEvent();
       e.entityId = entityId;
-      ScreenBounceTopic.dispatch(topics, e);
+      ScreenBounceTopic.dispatch(m.topics, e);
     }
   }
 }

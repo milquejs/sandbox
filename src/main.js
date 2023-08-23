@@ -1,9 +1,8 @@
-import { AssetManager, EntityManager, Experimental, FlexCanvas, InputPort } from '@milquejs/milque';
+import { AnimationFrameLoop, AssetManager, EntityManager, Experimental, FlexCanvas, InputPort, Topic, TopicManager } from '@milquejs/milque';
 import { VelocitySystem } from './systems/Velocity';
 import { ScreenBounceConfiguration, ScreenBounceSystem } from './systems/ScreenBounce';
 import { BouncingBox } from './systems/BouncingBox';
 import { ProviderManager } from './systems/ProviderManager';
-import { FRAME, FrameProvider } from './systems/FrameProvider';
 import { SystemManager } from './systems/SystemManager';
 import { EffectManager } from './systems/EffectManager';
 
@@ -13,17 +12,13 @@ FlexCanvas.define();
 // Literally dependency inject whenever you need access to something
 // and it's free! :D
 
+// Isn't this just require()?
+
 export async function main() {
   // Load
   const m = await createModule();
 
   await BouncingBox.onLoad(m);
-
-  /** @type {SystemManager<World>} */
-  const systems = new SystemManager();
-  systems.register(VelocitySystem);
-  systems.register(ScreenBounceSystem);
-  systems.register(MainSystem);
 
   // Init
   provide(m, ScreenBounceConfiguration, {
@@ -32,23 +27,32 @@ export async function main() {
     maxScreenX: m.display.width,
     maxScreenY: m.display.height,
   });
-  provide(m, FrameProvider);
 
-  const { topics, loop } = m.providers.get(null, FrameProvider);
-  FRAME.on(topics, 0, () => {
+  /** @type {SystemManager<World>} */
+  const systems = new SystemManager();
+  systems.register(VelocitySystem);
+  systems.register(ScreenBounceSystem);
+  systems.register(MainSystem);
+  
+  FRAME.on(m.topics, 0, () => {
     // Updates
     for(let system of systems.values()) {
       let effect = m.effects.get(system);
       effect.open();
-      systems.run(m, system);
+      let result = systems.run(m, system);
       effect.close();
+      if (typeof result !== 'undefined') {
+        // This is the end of this system!
+        SYSTEM_RESULT.dispatch(m.topics, { system, result });
+        effect.revert();
+      }
     }
 
     // Draw
     m.tia.cls(m.ctx, 0x333333);
     m.bouncingBox.onDraw(m);
   });
-  FRAME.on(topics, 10, () => {
+  FRAME.on(m.topics, 10, () => {
     // Effects
     let results = [];
     for(let system of systems.values()) {
@@ -58,7 +62,7 @@ export async function main() {
     Promise.all(results);
   });
 
-  loop.start();
+  m.loop.start();
 }
 
 /**
@@ -91,7 +95,7 @@ export function provide(m, provider, initial = undefined) {
 /**
  * @template T
  * @param {World} m 
- * @param {import('@/systems/SystemManager').SystemFunction<any>} scope
+ * @param {import('@/systems/SystemManager').SystemFunction<any, any>} scope
  * @param {import('./systems/ProviderManager').ProviderFunction<World, T>} provider 
  * @param {T} [initial]
  */
@@ -103,7 +107,7 @@ export function provideFor(m, scope, provider, initial = undefined) {
  * @param {World} m
  */
 export function useCurrentSystem(m) {
-  const result = /** @type {import('./systems/SystemManager').SystemContext<World>} */ (m).current;
+  const result = /** @type {import('./systems/SystemManager').SystemContext<World, any>} */ (m).current;
   if (!result) {
     throw new Error('Cannot use() outside of system scope.');
   }
@@ -136,6 +140,12 @@ export function useProvider(m, provider) {
   return m.providers.get(handle, provider);
 }
 
+export const PRE_FRAME = new Topic('SYSTEM.PREFRAME');
+export const FRAME = new Topic('SYSTEM.FRAME');
+
+/** @type {Topic<any>} */
+export const SYSTEM_RESULT = new Topic('SYSTEM.RESULT');
+
 /** @typedef {Awaited<ReturnType<createModule>>} World */
 async function createModule() {
   const display = new FlexCanvas({
@@ -157,6 +167,7 @@ async function createModule() {
 
   const effects = new EffectManager();
   const providers = new ProviderManager();
+  const topics = new TopicManager();
 
   let result = {
     display,
@@ -167,9 +178,32 @@ async function createModule() {
     ents,
     bouncingBox,
     assets,
+    frame: createAnimationFrameDetail(),
+    /** @type {AnimationFrameLoop} */
+    loop: /** @type {any} */(undefined),
     // ---
     effects,
     providers,
+    topics,
   };
+  result.loop = new AnimationFrameLoop(e => {
+    PRE_FRAME.dispatchImmediately(topics, e);
+    // If it was cancelled early in M.FRAME, early out.
+    if (!e.running) {
+      return;
+    }
+    result.frame = e.detail;
+    FRAME.dispatchImmediately(topics, e);
+    topics.flush();
+  });
   return result;
+}
+
+/** @returns {import('@milquejs/milque').AnimationFrameDetail} */
+function createAnimationFrameDetail() {
+  return {
+    currentTime: -1,
+    prevTime: -1,
+    deltaTime: 0,
+  };
 }

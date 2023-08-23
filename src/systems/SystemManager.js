@@ -1,13 +1,13 @@
-import { EffectManager } from './EffectManager';
-
 /**
  * @template {object} M
- * @typedef {(m: M) => void} SystemFunction
+ * @template Result
+ * @typedef {(m: M) => Result|void} SystemFunction
  */
 
 /**
  * @template {object} M
- * @typedef {M & { current: SystemFunction<M> }} SystemContext<M>
+ * @template Result
+ * @typedef {M & { current: SystemFunction<M, Result>, result: Result|undefined }} SystemContext
  */
 
 /**
@@ -15,13 +15,13 @@ import { EffectManager } from './EffectManager';
  */
 export class SystemManager {
 
-  /** @type {Array<SystemFunction<M>>} */
+  /** @type {Array<SystemFunction<M, any>>} */
   systems = [];
-  /** @type {Array<SystemContext<M>|null>} */
+  /** @type {Array<SystemContext<M, any>|null>} */
   contexts = [];
 
   /**
-   * @param {SystemFunction<M>} handle
+   * @param {SystemFunction<M, any>} handle
    */
   register(handle) {
     if (this.systems.includes(handle)) {
@@ -33,7 +33,7 @@ export class SystemManager {
   }
 
   /**
-   * @param {SystemFunction<M>} handle
+   * @param {SystemFunction<M, any>} handle
    */
   unregister(handle) {
     let i = this.systems.indexOf(handle);
@@ -46,8 +46,9 @@ export class SystemManager {
   }
 
   /**
-   * @param {M} context 
-   * @param {SystemFunction<M>} handle
+   * @template Result
+   * @param {M} context
+   * @param {SystemFunction<M, Result>} handle
    */
   run(context, handle) {
     let i = this.systems.indexOf(handle);
@@ -56,14 +57,19 @@ export class SystemManager {
     }
     let m = this.contexts[i];
     if (!m) {
-      m = createContext(handle, context);
+      m = deriveContext(handle, context);
       this.contexts[i] = m;
     }
-    handle(m);
+    if (typeof m.result !== 'undefined') {
+      return;
+    }
+    let result = handle(m);
+    m.result = result;
+    return result;
   }
 
   /**
-   * @param {SystemFunction<M>} handle
+   * @param {SystemFunction<M, any>} handle
    */
   has(handle) {
     return this.systems.indexOf(handle) >= 0;
@@ -76,13 +82,15 @@ export class SystemManager {
 
 /**
  * @template {object} M
- * @param {SystemFunction<M>} handle 
+ * @template Result
+ * @param {SystemFunction<M, Result>} handle 
  * @param {M} context
- * @returns {SystemContext<M>}
+ * @returns {SystemContext<M, Result>}
  */
-function createContext(handle, context) {
-  let result = /** @type {SystemContext<M>} */ ({
+function deriveContext(handle, context) {
+  let result = /** @type {SystemContext<M, Result>} */ ({
     current: handle,
+    result: undefined,
   });
   Object.setPrototypeOf(result, context);
   return result;
