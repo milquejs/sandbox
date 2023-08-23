@@ -7,15 +7,12 @@ import { FrameProvider } from './FrameProvider';
 
 export const ScreenBounce = new ComponentClass('screenBounce');
 
-const UpdateScreenBounceQuery = new Query(ScreenBounce, Position, Velocity);
-
+/** @type {Topic<ScreenBounceEvent>} */
+export const ScreenBounceTopic = new Topic('screenBounce.bounce');
 export class ScreenBounceEvent {
   /** @type {import('@milquejs/milque').EntityId} */
   entityId = 0;
 }
-
-/** @type {Topic<ScreenBounceEvent>} */
-export const OnScreenBounce = new Topic('screenBounce.bounce');
 
 export class ScreenBounceConfiguration {
   minScreenX = 0;
@@ -23,6 +20,8 @@ export class ScreenBounceConfiguration {
   maxScreenX = 160;
   maxScreenY = 90;
 }
+
+const UpdateScreenBounceQuery = new Query(ScreenBounce, Position, Velocity);
 
 /**
  * @param {import('../main').World} m
@@ -53,7 +52,7 @@ export function ScreenBounceSystem(m) {
     if (flag) {
       let e = new ScreenBounceEvent();
       e.entityId = entityId;
-      OnScreenBounce.dispatch(topics, e);
+      ScreenBounceTopic.dispatch(topics, e);
     }
   }
 }

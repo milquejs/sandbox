@@ -1,6 +1,6 @@
 import { Position } from './Position';
 import { Velocity } from './Velocity';
-import { OnScreenBounce, ScreenBounce, ScreenBounceEvent } from './ScreenBounce';
+import { ScreenBounceTopic, ScreenBounce, ScreenBounceEvent } from './ScreenBounce';
 import { ComponentClass, EntityManager, Random } from '@milquejs/milque';
 import sheepPngAsset from '@/assets/sheep.png.asset';
 import { useProvider } from '../main';
@@ -28,7 +28,7 @@ export class BouncingBox {
   onCreate(m) {
     const { topics } = useProvider(m, FrameProvider);
     this.entityId = createAs(m.ents, this, Position, Velocity, ScreenBounce);
-    OnScreenBounce.on(topics, 0, this.onBounce);
+    ScreenBounceTopic.on(topics, 0, this.onBounce);
   }
 
   /** @param {import('../main').World} m */

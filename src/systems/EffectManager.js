@@ -3,45 +3,36 @@
 /** @typedef {() => void|Promise<void>} AfterEffectHandler */
 /** @typedef {Array<any>} EffectDependencyList */
 
+/** @template Handle */
 export class EffectManager {
-  constructor() {
-    /** @type {Map<any, EffectContext>} */
-    this.contexts = new Map();
-  }
+
+  /** @type {Map<Handle, EffectContext>} */
+  contexts = new Map();
 
   /**
-   * @param {any} handle
-   */
-  register(handle) {
-    this.contexts.set(handle, new EffectContext());
-  }
-
-  /**
-   * IMPORTANT: Be sure to revert the effect before un-registering!
-   * 
-   * @param {any} handle
-   */
-  unregister(handle) {
-    this.contexts.delete(handle);
-  }
-
-  /**
-   * @param {any} handle 
+   * @param {Handle} handle 
    * @returns {EffectContext}
    */
   get(handle) {
     let result = this.contexts.get(handle);
     if (!result) {
-      throw new Error(`Cannot find registered effect context for handle '${String(handle)}'.`)
+      result = new EffectContext();
+      this.contexts.set(handle, result);
     }
     return result;
   }
 
   /**
-   * @param {any} handle
+   * @param {Handle} handle
    */
   has(handle) {
     return this.contexts.has(handle);
+  }
+
+  async clear() {
+    let contexts = [...this.contexts.values()];
+    this.contexts.clear();
+    await Promise.all(contexts.map(context => context.revert()));
   }
 }
 

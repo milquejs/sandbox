@@ -17,6 +17,8 @@ export async function main() {
   // Load
   const m = await createModule();
 
+  await BouncingBox.onLoad(m);
+
   /** @type {SystemManager<World>} */
   const systems = new SystemManager();
   systems.register(VelocitySystem);
@@ -32,15 +34,10 @@ export async function main() {
   });
   provide(m, FrameProvider);
 
-  await BouncingBox.onLoad(m);
-
   const { topics, loop } = m.providers.get(null, FrameProvider);
-  FRAME.on(topics, 0, () => {    
+  FRAME.on(topics, 0, () => {
     // Updates
     for(let system of systems.values()) {
-      if (!m.effects.has(system)) {
-        m.effects.register(system);
-      }
       let effect = m.effects.get(system);
       effect.open();
       systems.run(m, system);
@@ -73,7 +70,7 @@ function MainSystem(m) {
     return () => {
       m.bouncingBox.onDestroy(m);
     };
-  }, []);
+  });
   m.bouncingBox.onUpdate(m);
   
   let config = useProvider(m, ScreenBounceConfiguration);
