@@ -7,7 +7,6 @@
 const GLOBAL_SCOPE = null;
 
 export class ProviderManager {
-
   constructor() {
     /** @type {Map<ProviderFunction<any, any>, Map<any, any>>} */
     this.values = new Map();
@@ -17,7 +16,7 @@ export class ProviderManager {
    * @template M
    * @template T
    * @param {M} context
-   * @param {ProviderFunction<M, T>} handle 
+   * @param {ProviderFunction<M, T>} handle
    * @param {T} [initial]
    */
   provide(context, handle, initial = undefined) {
@@ -29,7 +28,7 @@ export class ProviderManager {
    * @template T
    * @param {M} context
    * @param {any} scope
-   * @param {ProviderFunction<M, T>} handle 
+   * @param {ProviderFunction<M, T>} handle
    * @param {T} [initial]
    */
   provideFor(context, scope, handle, initial = undefined) {
@@ -73,13 +72,15 @@ export class ProviderManager {
   /**
    * @template T
    * @param {any} scope
-   * @param {ProviderFunction<any, T>} handle 
+   * @param {ProviderFunction<any, T>} handle
    * @returns {T}
    */
   get(scope, handle) {
     const scoped = this.values.get(handle);
     if (!scoped) {
-      throw new Error(`Cannot get provider for unregistered handle '${String(handle)}'.`);
+      throw new Error(
+        `Cannot get provider for unregistered handle '${String(handle)}'.`,
+      );
     }
     return scoped.get(scope) || scoped.get(GLOBAL_SCOPE);
   }

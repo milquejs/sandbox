@@ -1,16 +1,14 @@
-
 /** @typedef {() => void|Promise<void>|AfterEffectHandler|Promise<AfterEffectHandler>} EffectHandler */
 /** @typedef {() => void|Promise<void>} AfterEffectHandler */
 /** @typedef {Array<any>} EffectDependencyList */
 
 /** @template Handle */
 export class EffectManager {
-
   /** @type {Map<Handle, EffectContext>} */
   contexts = new Map();
 
   /**
-   * @param {Handle} handle 
+   * @param {Handle} handle
    * @returns {EffectContext}
    */
   get(handle) {
@@ -32,7 +30,7 @@ export class EffectManager {
   async clear() {
     let contexts = [...this.contexts.values()];
     this.contexts.clear();
-    await Promise.all(contexts.map(context => context.revert()));
+    await Promise.all(contexts.map((context) => context.revert()));
   }
 }
 
@@ -68,12 +66,14 @@ export class EffectContext {
   }
 
   /**
-   * @param {EffectHandler} handler 
+   * @param {EffectHandler} handler
    * @param {EffectDependencyList|undefined} [deps]
    */
   capture(handler, deps = undefined) {
     if (this.index < 0) {
-      throw new Error('Cannot capture outside of closed effect context - must be opened first.');
+      throw new Error(
+        'Cannot capture outside of closed effect context - must be opened first.',
+      );
     }
     let current = this.index;
     if (current < this.befores.length) {
@@ -92,10 +92,12 @@ export class EffectContext {
 
   async apply() {
     if (this.index >= 0) {
-      throw new Error('Cannot apply inside of opened effect context - must be closed first.');
+      throw new Error(
+        'Cannot apply inside of opened effect context - must be closed first.',
+      );
     }
     let len = this.befores.length;
-    for(let i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       const before = this.befores[i];
       const after = this.afters[i];
       this.befores[i] = undefined;
@@ -106,7 +108,10 @@ export class EffectContext {
       if (typeof after === 'function') {
         // Clean-up the previous handler before starting the new one.
         await after();
-        if (typeof this.befores[i] !== 'undefined' || typeof this.afters[i] !== 'undefined') {
+        if (
+          typeof this.befores[i] !== 'undefined' ||
+          typeof this.afters[i] !== 'undefined'
+        ) {
           // NOTE: While awaiting for after() to complete, we have already prepared/applied
           //  a new handler. Just exit and use that instead.
           return;
@@ -115,8 +120,11 @@ export class EffectContext {
       let next = undefined;
       if (typeof before === 'function') {
         // Start the next one.
-        next = await before() || undefined;
-        if (typeof this.befores[i] !== 'undefined' || typeof this.afters[i] !== 'undefined') {
+        next = (await before()) || undefined;
+        if (
+          typeof this.befores[i] !== 'undefined' ||
+          typeof this.afters[i] !== 'undefined'
+        ) {
           // NOTE: While awaiting for before() to complete, we have already prepared/applied
           //  a new handler. Clean-up and use the new one instead.
           if (typeof next === 'function') {
@@ -132,11 +140,13 @@ export class EffectContext {
 
   async revert() {
     if (this.index >= 0) {
-      throw new Error('Cannot revert inside of opened effect context - must be closed first.');
+      throw new Error(
+        'Cannot revert inside of opened effect context - must be closed first.',
+      );
     }
     // NOTE: Clean-up all the afters. Do not start any befores.
     let len = this.afters.length;
-    for(let i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
       let after = this.afters[i];
       if (typeof after === 'function') {
         await after();
@@ -147,14 +157,18 @@ export class EffectContext {
 }
 
 /**
- * @param {Array<any>|undefined} prev 
+ * @param {Array<any>|undefined} prev
  * @param {Array<any>|undefined} next
  */
 function isMemoized(prev, next) {
-  if (!Array.isArray(prev) || !Array.isArray(next) || next.length !== prev.length) {
+  if (
+    !Array.isArray(prev) ||
+    !Array.isArray(next) ||
+    next.length !== prev.length
+  ) {
     return false;
   }
-  for(let i = 0; i < prev.length; ++i) {
+  for (let i = 0; i < prev.length; ++i) {
     // NOTE: Do shallow equality for memo check.
     if (prev[i] !== next[i]) {
       return false;
