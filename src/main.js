@@ -1,209 +1,227 @@
-import { AnimationFrameLoop, AssetManager, EntityManager, Experimental, FlexCanvas, InputPort, Topic, TopicManager } from '@milquejs/milque';
-import { VelocitySystem } from './systems/Velocity';
-import { ScreenBounceConfiguration, ScreenBounceSystem } from './systems/ScreenBounce';
-import { BouncingBox } from './systems/BouncingBox';
-import { ProviderManager } from './systems/ProviderManager';
-import { SystemManager } from './systems/SystemManager';
-import { EffectManager } from './systems/EffectManager';
+import { AnimationFrameLoop, Archetype, AsyncTopic, AxisBinding, ButtonBinding, ComponentClass, EntityManager, Experimental, FlexCanvas, InputContext, KeyCodes, Topic, TopicManager, lerp, screenToWorldRay } from '@milquejs/milque';
 
 FlexCanvas.define();
 
-// What I like about hooks, is that it is global scope WITHOUT singleton.
-// Literally dependency inject whenever you need access to something
-// and it's free! :D
-
-// Isn't this just require()?
-
 export async function main() {
-  // Load
-  const m = await createModule();
+  const world = new World();
+  await world.init();
 
-  await BouncingBox.onLoad(m);
+  ChessBoard(world);
+  CameraView(world);
+  Cursor(world);
+  ChessPiece(world);
+}
 
-  // Init
-  provide(m, ScreenBounceConfiguration, {
-    minScreenX: 0,
-    minScreenY: 0,
-    maxScreenX: m.display.width,
-    maxScreenY: m.display.height,
-  });
+const CameraComponent = new ComponentClass('camera', () => ({
+  targetX: 0,
+  targetY: 0,
+  viewX: 0,
+  viewY: 0,
+}));
+const CameraArchetype = new Archetype({ camera: CameraComponent });
 
-  /** @type {SystemManager<World>} */
-  const systems = new SystemManager();
-  systems.register(VelocitySystem);
-  systems.register(ScreenBounceSystem);
-  systems.register(MainSystem);
+const CameraControlX = new AxisBinding('camera.x', [KeyCodes.MOUSE_WHEEL_X]);
+const CameraControlY = new AxisBinding('camera.Y', [KeyCodes.MOUSE_WHEEL_Y]);
+
+/** @type {Topic<World>} */
+const WorldViewRender = new Topic('world.viewrender');
+
+/**
+ * @param {World} w 
+ */
+function CameraView(w) {
+  CameraArchetype.create(w.ents);
+  CameraControlX.bindKeys(w.axb);
+  CameraControlY.bindKeys(w.axb);
   
-  FRAME.on(m.topics, 0, () => {
-    // Updates
-    for(let system of systems.values()) {
-      let effect = m.effects.get(system);
-      effect.open();
-      let result = systems.run(m, system);
-      effect.close();
-      if (typeof result !== 'undefined') {
-        // This is the end of this system!
-        SYSTEM_RESULT.dispatch(m.topics, { system, result });
-        effect.revert();
-      }
+  WorldUpdate.on(w.topics, 0, w => {
+    let dx = CameraControlX.get(w.axb).delta;
+    let dy = CameraControlY.get(w.axb).delta;
+    for(let entity of CameraArchetype.findAll(w.ents)) {
+      entity.camera.targetX += dx;
+      entity.camera.targetY += dy;
+      entity.camera.viewX = lerp(entity.camera.viewX, entity.camera.targetX, w.dt);
+      entity.camera.viewY = lerp(entity.camera.viewY, entity.camera.targetY, w.dt);
     }
-
-    // Draw
-    m.tia.cls(m.ctx, 0x333333);
-    m.bouncingBox.onDraw(m);
   });
-  FRAME.on(m.topics, 10, () => {
-    // Effects
-    let results = [];
-    for(let system of systems.values()) {
-      let effect = m.effects.get(system);
-      results.push(effect.apply());
+
+  WorldRender.on(w.topics, 0, w => {
+    const e = CameraArchetype.findAny(w.ents);
+    w.tia.push();
+    w.tia.matPos(-e.camera.viewX, -e.camera.viewY);
+    WorldViewRender.dispatchImmediately(w.topics, w);
+    w.tia.pop();
+  });
+}
+
+const CELL_WIDTH = 64;
+const CELL_HEIGHT = 64;
+
+const CursorClick = new ButtonBinding('cursor.click', [KeyCodes.MOUSE_BUTTON_0]);
+const CursorX = new AxisBinding('cursor.x', [KeyCodes.MOUSE_POS_X]);
+const CursorY = new AxisBinding('cursor.y', [KeyCodes.MOUSE_POS_Y]);
+
+/**
+ * @type {Topic<{ x: number, y: number }>}
+ */
+const CursorClickTopic = new Topic('cursor.click');
+
+/**
+ * @param {World} world 
+ */
+function Cursor(world) {
+  CursorX.bindKeys(world.axb);
+  CursorY.bindKeys(world.axb);
+
+  WorldUpdate.on(world.topics, 0, w => {
+    if (CursorClick.get(w.axb).pressed) {
+      CursorClickTopic.dispatch(w.topics, {
+        x: 0,
+        y: 0,
+      });
     }
-    Promise.all(results);
   });
 
-  m.loop.start();
-}
-
-/**
- * @param {World} m 
- */
-function MainSystem(m) {
-  useEffect(m, () => {
-    m.bouncingBox.onCreate(m);
-    return () => {
-      m.bouncingBox.onDestroy(m);
-    };
+  WorldRender.on(world.topics, 0, w => {
+    const camera = CameraArchetype.findAny(w.ents);
+    let cx = CursorX.get(w.axb).value * w.canvas.width;
+    let cy = CursorY.get(w.axb).value * w.canvas.height;
+    let vx = -camera.camera.viewX;
+    let vy = -camera.camera.viewY;
+    let wx = cx - vx;
+    let wy = cy - vy;
+    let dx = Math.floor(wx / CELL_WIDTH) * CELL_WIDTH + vx;
+    let dy = Math.floor(wy / CELL_HEIGHT) * CELL_HEIGHT + vy;
+    w.tia.push();
+    w.tia.matPos(dx, dy);
+    renderCursor(w.tia, w.ctx);
+    w.tia.pop();
   });
-  m.bouncingBox.onUpdate(m);
-  
-  let config = useProvider(m, ScreenBounceConfiguration);
-  config.maxScreenX = m.display.width;
-  config.maxScreenY = m.display.height;
 }
 
 /**
- * @template T
- * @param {World} m 
- * @param {import('./systems/ProviderManager').ProviderFunction<World, T>} provider 
- * @param {T} [initial]
+ * @param {Experimental.Tia} tia 
+ * @param {CanvasRenderingContext2D} ctx
  */
-export function provide(m, provider, initial = undefined) {
-  m.providers.provide(m, provider, initial);
+function renderCursor(tia, ctx) {
+  tia.rectFill(ctx, 0, 0, 64, 64, 0xFF0000);
+}
+
+const ChessPieceComponent = new ComponentClass('chesspice', () => ({
+  x: 0,
+  y: 0,
+  type: 'pawn',
+}));
+const ChessPieceArchetype = new Archetype({ chessPiece: ChessPieceComponent });
+
+/**
+ * @param {World} world 
+ */
+function ChessPiece(world) {
+  let e = ChessPieceArchetype.create(world.ents);
+
+  WorldViewRender.on(world.topics, 0, w => {
+    for (let e of ChessPieceArchetype.findAll(w.ents)) {
+      renderChessPiece(w.tia, w.ctx, e.chessPiece.type);
+    }
+  });
 }
 
 /**
- * @template T
- * @param {World} m 
- * @param {import('@/systems/SystemManager').SystemFunction<any, any>} scope
- * @param {import('./systems/ProviderManager').ProviderFunction<World, T>} provider 
- * @param {T} [initial]
+ * @param {Experimental.Tia} tia 
+ * @param {CanvasRenderingContext2D} ctx 
+ * @param {string} type
  */
-export function provideFor(m, scope, provider, initial = undefined) {
-  m.providers.provideFor(m, scope, provider, initial);
-}
-
-/**
- * @param {World} m
- */
-export function useCurrentSystem(m) {
-  const result = /** @type {import('./systems/SystemManager').SystemContext<World, any>} */ (m).current;
-  if (!result) {
-    throw new Error('Cannot use() outside of system scope.');
+function renderChessPiece(tia, ctx, type) {
+  switch(type) {
+    case 'pawn':
+      tia.rectFill(ctx, 16, 16, 48, 48, 0xFF00FF);
+      break;
+    default:
+      break;
   }
-  return result;
 }
 
 /**
- * @param {World} m 
- * @param {import('./systems/EffectManager').EffectHandler} handler 
- * @param {import('./systems/EffectManager').EffectDependencyList} [deps]
+ * @param {World} world 
  */
-export function useEffect(m, handler, deps = []) {
-  const handle = useCurrentSystem(m);
-  let effect = m.effects.get(handle);
-  effect.capture(handler, deps);
+function ChessBoard(world) {
+  WorldRender.on(world.topics, 0, w => {
+    const camera = CameraArchetype.findAny(w.ents);
+    renderChessBoard(w.tia, w.ctx, -camera.camera.viewX, -camera.camera.viewY);
+  });
 }
 
 /**
- * @template T
- * @param {World} m 
- * @param {import('./systems/ProviderManager').ProviderFunction<World, T>} provider
- * @returns {T}
+ * @param {Experimental.Tia} tia 
+ * @param {CanvasRenderingContext2D} ctx 
+ * @param {number} offsetX 
+ * @param {number} offsetY 
  */
-export function useProvider(m, provider) {
-  const handle = useCurrentSystem(m);
-  if (!m.providers.has(handle, provider)) {
-    // By default, register globally.
-    m.providers.provide(m, provider);
+function renderChessBoard(tia, ctx, offsetX, offsetY) {
+  let screenWidth = ctx.canvas.width;
+  let screenHeight = ctx.canvas.height;
+  let cellWidth = 64;
+  let cellHeight = 64;
+  let numOfColumns = screenWidth / cellWidth;
+  let numOfRows = screenHeight / cellHeight;
+  let cellOffsetX = offsetX % cellWidth;
+  let cellOffsetY = offsetY % cellHeight;
+  let isOffsetXEven = Math.abs(Math.trunc(offsetX / cellWidth)) % 2 === 0;
+  let isOffsetYEven = Math.abs(Math.trunc(offsetY / cellHeight)) % 2 === 0;
+  tia.push();
+  tia.matPos(cellOffsetX, cellOffsetY);
+  const maxY = numOfRows + 1;
+  const minY = -1;
+  const maxX = numOfColumns + 2;
+  const color = 0xFFFFFF;
+  for(let y = minY; y < maxY; ++y) {
+    let startX = y % 2 === 0 ? 0 : -1;
+    if (isOffsetYEven !== isOffsetXEven) {
+      startX = y % 2 === 0 ? -1 : 0;
+    }
+    for(let x = startX; x < maxX; x += 2) {
+      tia.rectFill(ctx, x * cellWidth, y * cellHeight, (x + 1) * cellWidth, (y + 1) * cellHeight, color);
+    }
   }
-  return m.providers.get(handle, provider);
+  tia.pop();
 }
 
-export const PRE_FRAME = new Topic('SYSTEM.PREFRAME');
-export const FRAME = new Topic('SYSTEM.FRAME');
 
-/** @type {Topic<any>} */
-export const SYSTEM_RESULT = new Topic('SYSTEM.RESULT');
+/** @type {AsyncTopic<World>} */
+export const WorldLoad = new AsyncTopic('world.load');
+/** @type {Topic<World>} */
+export const WorldUpdate = new Topic('world.update');
+/** @type {Topic<World>} */
+export const WorldRender = new Topic('world.render');
 
-/** @typedef {Awaited<ReturnType<createModule>>} World */
-async function createModule() {
-  const display = new FlexCanvas({
+export class World {
+  canvas = new FlexCanvas({
     root: document.body,
-    sizing: 'viewport',
     width: 600,
     height: 400,
-    aspectRatio: 600 / 400,
+    aspectRatio: 600 / 400
   });
-  display.id = 'display';
-  const inputs = InputPort.create({ for: 'display' });
-  inputs.style.display = 'none';
-  const ctx = display.getContext('2d');
-  const axb = inputs.getContext('axisbutton');
-  const tia = new Experimental.Tia();
-  const ents = new EntityManager();
-  const bouncingBox = new BouncingBox();
-  const assets = new AssetManager();
+  ctx = this.canvas.getContext('2d');
+  tia = new Experimental.Tia();
+  topics = new TopicManager();
+  frame = /** @type { import('@milquejs/milque').AnimationFrameDetail } */ ({});
+  dt = 0;
+  loop = new AnimationFrameLoop(loop => {
+    this.frame = loop.detail;
+    this.dt = loop.detail.deltaTime / 60;
+    this.axb.poll(loop.detail.currentTime);
+    this.ents.flush();
+    WorldUpdate.dispatchImmediately(this.topics, this);
 
-  const effects = new EffectManager();
-  const providers = new ProviderManager();
-  const topics = new TopicManager();
-
-  let result = {
-    display,
-    inputs,
-    ctx,
-    axb,
-    tia,
-    ents,
-    bouncingBox,
-    assets,
-    frame: createAnimationFrameDetail(),
-    /** @type {AnimationFrameLoop} */
-    loop: /** @type {any} */(undefined),
-    // ---
-    effects,
-    providers,
-    topics,
-  };
-  result.loop = new AnimationFrameLoop(e => {
-    PRE_FRAME.dispatchImmediately(topics, e);
-    // If it was cancelled early in M.FRAME, early out.
-    if (!e.running) {
-      return;
-    }
-    result.frame = e.detail;
-    FRAME.dispatchImmediately(topics, e);
-    topics.flush();
+    this.tia.cls(this.ctx);
+    WorldRender.dispatchImmediately(this.topics, this);
   });
-  return result;
-}
+  ents = new EntityManager();
+  axb = new InputContext(this.canvas);
 
-/** @returns {import('@milquejs/milque').AnimationFrameDetail} */
-function createAnimationFrameDetail() {
-  return {
-    currentTime: -1,
-    prevTime: -1,
-    deltaTime: 0,
-  };
+  async init() {
+    await WorldLoad.dispatchImmediately(this.topics, this);
+    this.loop.start();
+  }
 }
