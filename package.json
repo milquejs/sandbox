@@ -20,7 +20,7 @@
   "author": "Andrew Kuo <andykuo1@duck.com>",
   "license": "MIT",
   "dependencies": {
-    "@milquejs/milque": "~0.0.2",
+    "@milquejs/milque": "~0.0.3",
     "gl-matrix": "~3.4.3"
   },
   "devDependencies": {
