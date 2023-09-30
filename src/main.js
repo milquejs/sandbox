@@ -2,6 +2,7 @@ import { AnimationFrameLoop, FlexCanvas, InputContext } from '@milquejs/milque';
 
 import { Game } from './game/Game';
 import { MainScene } from './v2/MainScene';
+import { MenuScene } from './v2/MenuScene';
 
 FlexCanvas.define();
 
@@ -14,11 +15,12 @@ export async function main() {
   });
   const loop = new AnimationFrameLoop();
 
+  const menuScene = new MenuScene();
   const mainScene = new MainScene();
 
   const game = new Game(
-    [mainScene],
-    [mainScene],
+    [menuScene],
+    [menuScene],
     canvas.getContext('2d'),
     new InputContext(canvas),
   );

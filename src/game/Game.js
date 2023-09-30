@@ -6,7 +6,7 @@ import { AnimationFrameDetail, InputContext } from '@milquejs/milque';
  * @property {() => Promise<void>} [unload]
  * @property {() => void} [init]
  * @property {() => void} [dead]
- * @property {(axb: InputContext) => void} input
+ * @property {(axb: InputContext) => void} [input]
  * @property {(dt: number) => void} update
  *
  * @typedef GameRendererLike
