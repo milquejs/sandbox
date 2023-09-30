@@ -1,9 +1,10 @@
 import { Random } from '@milquejs/milque';
+
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
 import { MainScene } from './MainScene';
 import { ParticleSystem, explode } from './Particles';
-import { drawCollisionCircle, withinRadius, wrapAround } from './Utils';
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
 import { PLAYER_RADIUS, killPlayer } from './Players';
+import { drawCollisionCircle, withinRadius, wrapAround } from './Utils';
 
 export const SMALL_ASTEROID_RADIUS = 4;
 export const ASTEROID_BREAK_DAMP_FACTOR = 0.1;
@@ -72,7 +73,7 @@ class AsteroidSpawner {
       Random.range(spawnRange[1], spawnRange[1] + spawnRange[3]),
       Random.range(-ASTEROID_SPEED, ASTEROID_SPEED),
       Random.range(-ASTEROID_SPEED, ASTEROID_SPEED),
-      ASTEROID_RADIUS
+      ASTEROID_RADIUS,
     );
   }
 
@@ -81,7 +82,7 @@ class AsteroidSpawner {
   }
 
   /**
-   * @param {number} dt 
+   * @param {number} dt
    * @param {MainScene} scene
    */
   update(dt, scene) {
@@ -91,14 +92,17 @@ class AsteroidSpawner {
     this.spawnTicks -= dt;
     if (this.spawnTicks <= 0) {
       this.spawn(scene.asteroids);
-      this.spawnTicks = Random.range(ASTEROID_SPAWN_RATE[0], ASTEROID_SPAWN_RATE[1]);
+      this.spawnTicks = Random.range(
+        ASTEROID_SPAWN_RATE[0],
+        ASTEROID_SPAWN_RATE[1],
+      );
     }
   }
 }
 
 /**
- * @param {AsteroidSystem} system 
- * @param {number} dt 
+ * @param {AsteroidSystem} system
+ * @param {number} dt
  * @param {any} player
  * @param {MainScene} scene
  * @param {ParticleSystem} particles
@@ -134,8 +138,8 @@ export function updateAsteroids(system, dt, player, scene, particles) {
 }
 
 /**
- * @param {AsteroidSystem} system 
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {AsteroidSystem} system
+ * @param {CanvasRenderingContext2D} ctx
  */
 export function drawAsteroids(system, ctx) {
   // Draw asteroid
@@ -147,7 +151,7 @@ export function drawAsteroids(system, ctx) {
       -asteroid.size,
       -asteroid.size,
       asteroid.size * 2,
-      asteroid.size * 2
+      asteroid.size * 2,
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -165,10 +169,10 @@ export class Asteroid {
 }
 
 /**
- * @param {AsteroidSystem} system 
- * @param {number} x 
- * @param {number} y 
- * @param {number} dx 
+ * @param {AsteroidSystem} system
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
  * @param {number} dy
  * @param {number} size
  */
@@ -185,8 +189,8 @@ export function spawnAsteroid(system, x, y, dx, dy, size) {
 }
 
 /**
- * @param {AsteroidSystem} system 
- * @param {Asteroid} asteroid 
+ * @param {AsteroidSystem} system
+ * @param {Asteroid} asteroid
  */
 export function destroyAsteroid(system, asteroid) {
   system.entities.splice(system.entities.indexOf(asteroid), 1);
@@ -200,8 +204,8 @@ export function countAsteroids(system) {
 }
 
 /**
- * @param {AsteroidSystem} system 
- * @param {Asteroid} asteroid 
+ * @param {AsteroidSystem} system
+ * @param {Asteroid} asteroid
  * @param {number} dx
  * @param {number} dy
  */
@@ -216,7 +220,7 @@ export function breakUpAsteroid(system, asteroid, dx = 0, dy = 0) {
     asteroid.y + Random.range(-ASTEROID_RADIUS, ASTEROID_RADIUS),
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dx,
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dy,
-    SMALL_ASTEROID_RADIUS
+    SMALL_ASTEROID_RADIUS,
   );
   spawnAsteroid(
     system,
@@ -224,7 +228,7 @@ export function breakUpAsteroid(system, asteroid, dx = 0, dy = 0) {
     asteroid.y + Random.range(-ASTEROID_RADIUS, ASTEROID_RADIUS),
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dx,
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dy,
-    SMALL_ASTEROID_RADIUS
+    SMALL_ASTEROID_RADIUS,
   );
   spawnAsteroid(
     system,
@@ -232,7 +236,7 @@ export function breakUpAsteroid(system, asteroid, dx = 0, dy = 0) {
     asteroid.y + Random.range(-ASTEROID_RADIUS, ASTEROID_RADIUS),
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dx,
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dy,
-    SMALL_ASTEROID_RADIUS
+    SMALL_ASTEROID_RADIUS,
   );
   spawnAsteroid(
     system,
@@ -240,19 +244,19 @@ export function breakUpAsteroid(system, asteroid, dx = 0, dy = 0) {
     asteroid.y + Random.range(-ASTEROID_RADIUS, ASTEROID_RADIUS),
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dx,
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED) + dy,
-    SMALL_ASTEROID_RADIUS
+    SMALL_ASTEROID_RADIUS,
   );
 }
 
 /**
- * @param {AsteroidSystem} system 
+ * @param {AsteroidSystem} system
  */
 export function onGameRestart(system) {
   system.spawner.reset();
 }
 
 /**
- * @param {AsteroidSystem} system 
+ * @param {AsteroidSystem} system
  * @param {MainScene} scene
  */
 export function onNextLevel(system, scene) {

@@ -13,7 +13,7 @@ const STAR_SPEED_RANGE = [0.3, 1];
 const STAR_PARTICLE_COUNT = 30;
 
 /**
- * @param {number} width 
+ * @param {number} width
  * @param {number} height
  */
 export function createStarfield(width, height) {
@@ -41,9 +41,9 @@ export function createStarfield(width, height) {
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {ReturnType<createStarfield>} starfield 
- * @param {string} color 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {ReturnType<createStarfield>} starfield
+ * @param {string} color
  */
 export function renderStarfield(ctx, starfield, color = 'white') {
   for (let i = 0; i < starfield.length; ++i) {
@@ -58,7 +58,7 @@ export function renderStarfield(ctx, starfield, color = 'white') {
 }
 
 /**
- * @param {ReturnType<createStarfield>} starfield 
+ * @param {ReturnType<createStarfield>} starfield
  * @param {number} dx
  * @param {number} dy
  */

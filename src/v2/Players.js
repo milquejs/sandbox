@@ -1,15 +1,39 @@
-import { ButtonBinding, InputContext, KeyCodes, Random } from '@milquejs/milque';
+import {
+  ButtonBinding,
+  InputContext,
+  KeyCodes,
+  Random,
+} from '@milquejs/milque';
+
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
-import { BULLET_SPEED, BulletSystem, MAX_BULLET_COUNT, countBullets, spawnBullet } from './Bullets';
+import {
+  BULLET_SPEED,
+  BulletSystem,
+  MAX_BULLET_COUNT,
+  countBullets,
+  spawnBullet,
+} from './Bullets';
 import { MainScene } from './MainScene';
 import { ParticleSystem, explode, thrust } from './Particles';
 import { drawCollisionCircle, wrapAround } from './Utils';
 import { FLASH_TIME_STEP } from './Values';
 
-export const PLAYER_UP = new ButtonBinding('up', [KeyCodes.ARROW_UP, KeyCodes.KEY_W]);
-export const PLAYER_DOWN = new ButtonBinding('down', [KeyCodes.ARROW_DOWN, KeyCodes.KEY_S]);
-export const PLAYER_LEFT = new ButtonBinding('left', [KeyCodes.ARROW_LEFT, KeyCodes.KEY_A]);
-export const PLAYER_RIGHT = new ButtonBinding('right', [KeyCodes.ARROW_RIGHT, KeyCodes.KEY_D]);
+export const PLAYER_UP = new ButtonBinding('up', [
+  KeyCodes.ARROW_UP,
+  KeyCodes.KEY_W,
+]);
+export const PLAYER_DOWN = new ButtonBinding('down', [
+  KeyCodes.ARROW_DOWN,
+  KeyCodes.KEY_S,
+]);
+export const PLAYER_LEFT = new ButtonBinding('left', [
+  KeyCodes.ARROW_LEFT,
+  KeyCodes.KEY_A,
+]);
+export const PLAYER_RIGHT = new ButtonBinding('right', [
+  KeyCodes.ARROW_RIGHT,
+  KeyCodes.KEY_D,
+]);
 export const PLAYER_FIRE = new ButtonBinding('fire', [KeyCodes.SPACE]);
 export const PLAYER_DEBUG = new ButtonBinding('debug', [KeyCodes.BACKSLASH]);
 
@@ -37,9 +61,7 @@ export const RAND_PLAYER_EXPLODE_PARTICLE_COLORS = () => {
   return Random.choose(PLAYER_EXPLODE_PARTICLE_COLORS);
 };
 
-export const PLAYER_MOVE_PARTICLE_COLORS = [
-  'gray', 'darkgray', 'lightgray'
-];
+export const PLAYER_MOVE_PARTICLE_COLORS = ['gray', 'darkgray', 'lightgray'];
 export const RAND_PLAYER_MOVE_PARTICLE_COLORS = () => {
   return Random.choose(PLAYER_MOVE_PARTICLE_COLORS);
 };
@@ -54,18 +76,21 @@ export class PlayerSystem {
 }
 
 /**
- * @param {InputContext} axb 
+ * @param {InputContext} axb
  */
 export function registerInputs(axb) {
   axb.bindKeys([
-    PLAYER_UP, PLAYER_DOWN,
-    PLAYER_LEFT, PLAYER_RIGHT,
-    PLAYER_FIRE, PLAYER_DEBUG
+    PLAYER_UP,
+    PLAYER_DOWN,
+    PLAYER_LEFT,
+    PLAYER_RIGHT,
+    PLAYER_FIRE,
+    PLAYER_DEBUG,
   ]);
 }
 
 /**
- * @param {PlayerSystem} system 
+ * @param {PlayerSystem} system
  * @param {Player} player
  * @param {InputContext} axb
  */
@@ -78,8 +103,8 @@ export function inputPlayer(system, player, axb) {
 }
 
 /**
- * @param {PlayerSystem} system 
- * @param {number} dt 
+ * @param {PlayerSystem} system
+ * @param {number} dt
  * @param {Player} player
  * @param {ParticleSystem} particles
  * @param {BulletSystem} bullets
@@ -91,10 +116,8 @@ export function updatePlayers(system, dt, player, particles, bullets) {
   const fireControl = player.fire;
 
   // Calculate velocity
-  player.dx +=
-    moveControl * Math.cos(player.rotation) * PLAYER_MOVE_SPEED;
-  player.dy +=
-    moveControl * Math.sin(player.rotation) * PLAYER_MOVE_SPEED;
+  player.dx += moveControl * Math.cos(player.rotation) * PLAYER_MOVE_SPEED;
+  player.dy += moveControl * Math.sin(player.rotation) * PLAYER_MOVE_SPEED;
   player.dx *= 1 - PLAYER_MOVE_FRICTION;
   player.dy *= 1 - PLAYER_MOVE_FRICTION;
 
@@ -136,11 +159,11 @@ export function updatePlayers(system, dt, player, particles, bullets) {
 }
 
 /**
- * @param {PlayerSystem} system 
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {PlayerSystem} system
+ * @param {CanvasRenderingContext2D} ctx
  */
 export function drawPlayers(system, ctx) {
-  for(let player of system.entities) {
+  for (let player of system.entities) {
     ctx.translate(player.x, player.y);
     ctx.rotate(player.rotation);
     ctx.fillStyle = 'white';
@@ -164,7 +187,7 @@ export function drawPlayers(system, ctx) {
       -size - sizeOffset / 2 + xOffset,
       -(size / 4) - sizeOffset / 2 + yOffset,
       size + sizeOffset,
-      size / 2 + sizeOffset
+      size / 2 + sizeOffset,
     );
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -202,8 +225,8 @@ export function spawnPlayer(system) {
 }
 
 /**
- * @param {PlayerSystem} system 
- * @param {Player} player 
+ * @param {PlayerSystem} system
+ * @param {Player} player
  */
 export function destroyPlayer(system, player) {
   system.entities.splice(system.entities.indexOf(player), 1);
@@ -217,8 +240,8 @@ export function countPlayers(system) {
 }
 
 /**
- * @param {PlayerSystem} system 
- * @param {Player} player 
+ * @param {PlayerSystem} system
+ * @param {Player} player
  * @param {BulletSystem} bullets
  */
 export function shoot(system, player, bullets) {
@@ -232,7 +255,7 @@ export function shoot(system, player, bullets) {
         player.x - Math.cos(rotation) * PLAYER_RADIUS,
         player.y - Math.sin(rotation) * PLAYER_RADIUS,
         -Math.cos(rotation) * BULLET_SPEED + player.dx,
-        -Math.sin(rotation) * BULLET_SPEED + player.dy
+        -Math.sin(rotation) * BULLET_SPEED + player.dy,
       );
     }
     --player.powerMode;
@@ -242,7 +265,7 @@ export function shoot(system, player, bullets) {
       player.x - Math.cos(player.rotation) * PLAYER_RADIUS,
       player.y - Math.sin(player.rotation) * PLAYER_RADIUS,
       -Math.cos(player.rotation) * BULLET_SPEED + player.dx,
-      -Math.sin(player.rotation) * BULLET_SPEED + player.dy
+      -Math.sin(player.rotation) * BULLET_SPEED + player.dy,
     );
   }
   player.cooldown = PLAYER_SHOOT_COOLDOWN;
@@ -250,10 +273,10 @@ export function shoot(system, player, bullets) {
 }
 
 /**
- * @param {PlayerSystem} system 
+ * @param {PlayerSystem} system
  */
 export function onNextLevel(system) {
-  for(let player of system.entities) {
+  for (let player of system.entities) {
     player.x = SCREEN_WIDTH / 2;
     player.y = SCREEN_HEIGHT / 2;
     player.dx = 0;
@@ -262,16 +285,16 @@ export function onNextLevel(system) {
 }
 
 /**
- * @param {PlayerSystem} system 
+ * @param {PlayerSystem} system
  */
 export function onGameRestart(system) {
-  for(let player of system.entities) {
+  for (let player of system.entities) {
     player.powerMode = 0;
   }
 }
 
 /**
- * @param {MainScene} scene 
+ * @param {MainScene} scene
  * @param {Player} player
  */
 export function killPlayer(scene, player) {

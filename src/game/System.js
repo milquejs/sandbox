@@ -8,7 +8,7 @@ export class System {
   dead() {}
 
   /**
-   * @param {InputContext} axb 
+   * @param {InputContext} axb
    */
   input(axb) {}
   /** @param {number} dt */

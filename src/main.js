@@ -1,7 +1,6 @@
 import { AnimationFrameLoop, FlexCanvas, InputContext } from '@milquejs/milque';
 
 import { Game } from './game/Game';
-
 import { MainScene } from './v2/MainScene';
 
 FlexCanvas.define();
@@ -16,8 +15,13 @@ export async function main() {
   const loop = new AnimationFrameLoop();
 
   const mainScene = new MainScene();
-  
-  const game = new Game([mainScene], [mainScene], canvas.getContext('2d'), new InputContext(canvas));
+
+  const game = new Game(
+    [mainScene],
+    [mainScene],
+    canvas.getContext('2d'),
+    new InputContext(canvas),
+  );
   await game.init();
 
   loop.start((e) => game.run(e.detail));

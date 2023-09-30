@@ -1,11 +1,12 @@
 import { ButtonBinding, InputContext, KeyCodes } from '@milquejs/milque';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../v1/Values';
+
 import * as Starfield from '../v1/Starfield';
-import * as PowerUps from './PowerUps';
-import * as Particles from './Particles';
-import * as Bullets from './Bullets';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
 import * as Asteroids from './Asteroids';
+import * as Bullets from './Bullets';
+import * as Particles from './Particles';
 import * as Players from './Players';
+import * as PowerUps from './PowerUps';
 
 const INSTRUCTION_HINT_TEXT = '[ wasd_ ]';
 const FLASH_TIME_STEP = 0.1;
@@ -13,7 +14,6 @@ const FLASH_TIME_STEP = 0.1;
 let SHOW_COLLISION = false;
 
 export class MainScene {
-
   isFirstInput = true;
 
   level = 0;
@@ -44,7 +44,7 @@ export class MainScene {
   }
 
   /**
-   * @param {number} dt 
+   * @param {number} dt
    */
   update(dt) {
     // NOTE: Ignore game pauses for particle updates
@@ -53,13 +53,25 @@ export class MainScene {
     if (this.gamePause) {
       return;
     }
-  
-    Players.updatePlayers(this.players, dt, this.player, this.particles, this.bullets);
+
+    Players.updatePlayers(
+      this.players,
+      dt,
+      this.player,
+      this.particles,
+      this.bullets,
+    );
     Bullets.updateBullets(this.bullets, dt, this);
-    Asteroids.updateAsteroids(this.asteroids, dt, this.player, this, this.particles);
+    Asteroids.updateAsteroids(
+      this.asteroids,
+      dt,
+      this.player,
+      this,
+      this.particles,
+    );
     Starfield.updateStarfield(this.starfield);
     PowerUps.updatePowerUps(this.powerUps, dt, this.player, this.particles);
-  
+
     if (!this.gamePause && Asteroids.countAsteroids(this.asteroids) <= 0) {
       this.gamePause = true;
       this.showPlayer = true;
@@ -69,7 +81,7 @@ export class MainScene {
   }
 
   /**
-   * @param {InputContext} axb 
+   * @param {InputContext} axb
    */
   firstInput(axb) {
     if (!this.isFirstInput) {
@@ -80,7 +92,7 @@ export class MainScene {
   }
 
   /**
-   * @param {InputContext} axb 
+   * @param {InputContext} axb
    */
   input(axb) {
     this.firstInput(axb);
@@ -109,9 +121,8 @@ export class MainScene {
     }
   }
 
-
   /**
-   * @param {RenderingContext} ctx 
+   * @param {RenderingContext} ctx
    */
   render(ctx) {
     ctx = /** @type {CanvasRenderingContext2D} */ (ctx);
@@ -141,7 +152,7 @@ export class MainScene {
     ctx.fillText(
       '= ' + String(this.score).padStart(2, '0') + ' =',
       SCREEN_WIDTH / 2,
-      SCREEN_HEIGHT / 2
+      SCREEN_HEIGHT / 2,
     );
     if (this.flashHighScore > 0) {
       ctx.fillStyle = `rgba(255, 255, 255, ${this.flashHighScore + 0.2})`;
@@ -153,7 +164,7 @@ export class MainScene {
     ctx.fillText(
       String(this.highScore).padStart(2, '0'),
       SCREEN_WIDTH / 2,
-      SCREEN_HEIGHT / 2 + 32
+      SCREEN_HEIGHT / 2 + 32,
     );
 
     // Draw timer
@@ -163,7 +174,7 @@ export class MainScene {
     ctx.fillText(
       `${Math.ceil(this.asteroids.spawner.spawnTicks / 1000)}`,
       SCREEN_WIDTH,
-      SCREEN_HEIGHT - 12
+      SCREEN_HEIGHT - 12,
     );
 
     Asteroids.drawAsteroids(this.asteroids, ctx);
@@ -179,7 +190,7 @@ export class MainScene {
 }
 
 /**
- * @param {MainScene} scene 
+ * @param {MainScene} scene
  */
 function nextLevel(scene) {
   scene.level++;

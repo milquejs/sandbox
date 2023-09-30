@@ -1,4 +1,5 @@
 import { ComponentFactory } from '@milquejs/milque';
+
 import { NodeTree } from '../util/NodeTree';
 import { Transform } from '../util/Transform';
 
@@ -14,8 +15,8 @@ export class SceneGraph {
   }
 
   /**
-   * @param {import('../util/NodeTree').NodeId} parentId 
-   * @param {any} node 
+   * @param {import('../util/NodeTree').NodeId} parentId
+   * @param {any} node
    */
   add(parentId, node) {
     let otherId = this.create();
@@ -24,17 +25,13 @@ export class SceneGraph {
   }
 }
 
-export class Group {
-
-}
+export class Group {}
 
 class Node {
   transform = new Transform();
 }
 
-class Renderer {
-
-}
+class Renderer {}
 
 export const Renderable = new ComponentFactory('Renderable', () => ({
   nodeId: 0,

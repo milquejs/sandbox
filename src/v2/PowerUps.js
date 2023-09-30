@@ -1,8 +1,9 @@
 import { Random } from '@milquejs/milque';
-import { drawCollisionCircle, withinRadius, wrapAround } from './Utils';
-import { ParticleSystem, explode } from './Particles';
+
 import { ASTEROID_SPAWN_RANGES, ASTEROID_SPEED } from './Asteroids';
+import { ParticleSystem, explode } from './Particles';
 import { PLAYER_RADIUS } from './Players';
+import { drawCollisionCircle, withinRadius, wrapAround } from './Utils';
 
 export const POWER_UP_SPAWN_RATE = [10000, 30000];
 export const POWER_UP_RADIUS = 4;
@@ -23,10 +24,10 @@ export class PowerUpSystem {
 }
 
 /**
- * @param {PowerUpSystem} system 
- * @param {number} dt 
- * @param {any} player 
- * @param {ParticleSystem} particles 
+ * @param {PowerUpSystem} system
+ * @param {number} dt
+ * @param {any} player
+ * @param {ParticleSystem} particles
  */
 export function updatePowerUps(system, dt, player, particles) {
   // Update power-up motion
@@ -46,7 +47,7 @@ export function updatePowerUps(system, dt, player, particles) {
         powerUp.x,
         powerUp.y,
         10,
-        RAND_POWER_UP_EXPLODE_PARTICLE_COLORS
+        RAND_POWER_UP_EXPLODE_PARTICLE_COLORS,
       );
       destroyPowerUp(system, powerUp);
       player.powerMode += POWER_UP_AMOUNT;
@@ -56,8 +57,8 @@ export function updatePowerUps(system, dt, player, particles) {
 }
 
 /**
- * @param {PowerUpSystem} system 
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {PowerUpSystem} system
+ * @param {CanvasRenderingContext2D} ctx
  */
 export function drawPowerUps(system, ctx) {
   // Draw power-up
@@ -88,9 +89,9 @@ export class PowerUp {
 
 /**
  * @param {PowerUpSystem} system
- * @param {number} x 
- * @param {number} y 
- * @param {number} dx 
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
  * @param {number} dy
  */
 export function spawnPowerUp(system, x, y, dx, dy) {
@@ -105,23 +106,24 @@ export function spawnPowerUp(system, x, y, dx, dy) {
 }
 
 /**
- * @param {PowerUpSystem} system 
+ * @param {PowerUpSystem} system
  */
 export function spawnRandomly(system) {
   let spawnRange = Random.choose(ASTEROID_SPAWN_RANGES);
-  return spawnPowerUp(system,
+  return spawnPowerUp(
+    system,
     // X range
     Random.range(spawnRange[0], spawnRange[0] + spawnRange[2]),
     // Y range
     Random.range(spawnRange[1], spawnRange[1] + spawnRange[3]),
     Random.range(-ASTEROID_SPEED, ASTEROID_SPEED),
-    Random.range(-ASTEROID_SPEED, ASTEROID_SPEED)
+    Random.range(-ASTEROID_SPEED, ASTEROID_SPEED),
   );
 }
 
 /**
- * @param {PowerUpSystem} system 
- * @param {PowerUp} powerUp 
+ * @param {PowerUpSystem} system
+ * @param {PowerUp} powerUp
  */
 export function destroyPowerUp(system, powerUp) {
   let i = system.entities.indexOf(powerUp);
@@ -129,7 +131,7 @@ export function destroyPowerUp(system, powerUp) {
 }
 
 /**
- * @param {PowerUpSystem} system 
+ * @param {PowerUpSystem} system
  */
 export function onNextLevel(system) {
   if (Random.next() > POWER_UP_SPAWN_CHANCE) {
@@ -138,7 +140,7 @@ export function onNextLevel(system) {
 }
 
 /**
- * @param {PowerUpSystem} system 
+ * @param {PowerUpSystem} system
  */
 export function onGameRestart(system) {
   system.entities.length = 0;

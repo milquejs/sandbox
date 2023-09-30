@@ -1,7 +1,4 @@
-import {
-  AnimationFrameDetail,
-  InputContext,
-} from '@milquejs/milque';
+import { AnimationFrameDetail, InputContext } from '@milquejs/milque';
 
 /**
  * @typedef GameSystemLike
@@ -26,7 +23,6 @@ export class Game {
    * @param {InputContext} inputContext
    */
   constructor(systems, renderers, renderContext, inputContext) {
-    
     /** @private */
     this.systems = systems;
     /** @private */

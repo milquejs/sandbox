@@ -1,6 +1,11 @@
 import { Random } from '@milquejs/milque';
+
+import {
+  MAX_PLAYER_MOVE_PARTICLE_LIFE_RATIO,
+  MIN_PLAYER_MOVE_PARTICLE_LIFE_RATIO,
+  PLAYER_MOVE_PARTICLE_OFFSET_RANGE,
+} from './Players';
 import { wrapAround } from './Utils';
-import { MAX_PLAYER_MOVE_PARTICLE_LIFE_RATIO, MIN_PLAYER_MOVE_PARTICLE_LIFE_RATIO, PLAYER_MOVE_PARTICLE_OFFSET_RANGE } from './Players';
 
 export const PARTICLE_RADIUS = 4;
 export const PARTICLE_SPEED = 2;
@@ -16,7 +21,7 @@ export class ParticleSystem {
 }
 
 /**
- * @param {ParticleSystem} system 
+ * @param {ParticleSystem} system
  * @param {number} dt
  */
 export function updateParticles(system, dt) {
@@ -36,8 +41,8 @@ export function updateParticles(system, dt) {
 }
 
 /**
- * @param {ParticleSystem} system 
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {ParticleSystem} system
+ * @param {CanvasRenderingContext2D} ctx
  */
 export function drawParticles(system, ctx) {
   for (let particle of system.entities) {
@@ -51,7 +56,7 @@ export function drawParticles(system, ctx) {
 }
 
 /**
- * @param {ParticleSystem} system 
+ * @param {ParticleSystem} system
  */
 export function onNextLevel(system) {
   system.entities.length = 0;
@@ -68,11 +73,11 @@ export class Particle {
 }
 
 /**
- * @param {ParticleSystem} system 
- * @param {number} x 
- * @param {number} y 
- * @param {number} dx 
- * @param {number} dy 
+ * @param {ParticleSystem} system
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
+ * @param {number} dy
  * @param {(() => string)|string} color
  */
 export function spawnParticle(system, x, y, dx, dy, color) {
@@ -89,18 +94,18 @@ export function spawnParticle(system, x, y, dx, dy, color) {
 }
 
 /**
- * @param {ParticleSystem} system 
- * @param {Particle} particle 
+ * @param {ParticleSystem} system
+ * @param {Particle} particle
  */
 export function destroyParticle(system, particle) {
   system.entities.splice(system.entities.indexOf(particle), 1);
 }
 
 /**
- * @param {ParticleSystem} system 
- * @param {number} x 
- * @param {number} y 
- * @param {number} amount 
+ * @param {ParticleSystem} system
+ * @param {number} x
+ * @param {number} y
+ * @param {number} amount
  * @param {(() => string)|string} color
  */
 export function explode(system, x, y, amount = 10, color) {
@@ -111,32 +116,40 @@ export function explode(system, x, y, amount = 10, color) {
       y,
       Random.range(-1, 1) * PARTICLE_SPEED,
       Random.range(-1, 1) * PARTICLE_SPEED,
-      color
+      color,
     );
   }
 }
 
 /**
- * @param {ParticleSystem} particles 
- * @param {number} x 
- * @param {number} y 
- * @param {number} dx 
- * @param {number} dy 
+ * @param {ParticleSystem} particles
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx
+ * @param {number} dy
  * @param {(() => string)|string} color
  */
 export function thrust(particles, x, y, dx, dy, color) {
   if (Random.next() > 0.3) {
     let particle = spawnParticle(
       particles,
-      x + Random.range(PLAYER_MOVE_PARTICLE_OFFSET_RANGE[0], PLAYER_MOVE_PARTICLE_OFFSET_RANGE[1]),
-      y + Random.range(PLAYER_MOVE_PARTICLE_OFFSET_RANGE[0], PLAYER_MOVE_PARTICLE_OFFSET_RANGE[1]),
+      x +
+        Random.range(
+          PLAYER_MOVE_PARTICLE_OFFSET_RANGE[0],
+          PLAYER_MOVE_PARTICLE_OFFSET_RANGE[1],
+        ),
+      y +
+        Random.range(
+          PLAYER_MOVE_PARTICLE_OFFSET_RANGE[0],
+          PLAYER_MOVE_PARTICLE_OFFSET_RANGE[1],
+        ),
       dx,
       dy,
-      color
+      color,
     );
     particle.age = Random.range(
       MAX_PARTICLE_AGE * MIN_PLAYER_MOVE_PARTICLE_LIFE_RATIO,
-      MAX_PARTICLE_AGE * MAX_PLAYER_MOVE_PARTICLE_LIFE_RATIO
+      MAX_PARTICLE_AGE * MAX_PLAYER_MOVE_PARTICLE_LIFE_RATIO,
     );
   }
 }

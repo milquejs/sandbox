@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../v1/Values';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
 import { SHOW_COLLISION } from './Values';
 
 /**
@@ -6,9 +6,9 @@ import { SHOW_COLLISION } from './Values';
  */
 
 /**
- * @param {Position} position 
- * @param {number} width 
- * @param {number} height 
+ * @param {Position} position
+ * @param {number} width
+ * @param {number} height
  */
 export function wrapAround(position, width, height) {
   if (position.x < -width) position.x = SCREEN_WIDTH;
@@ -18,8 +18,8 @@ export function wrapAround(position, width, height) {
 }
 
 /**
- * @param {Position} from 
- * @param {Position} to 
+ * @param {Position} from
+ * @param {Position} to
  * @param {number} radius
  */
 export function withinRadius(from, to, radius) {
@@ -29,9 +29,9 @@ export function withinRadius(from, to, radius) {
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
- * @param {number} x 
- * @param {number} y 
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} x
+ * @param {number} y
  * @param {number} radius
  */
 export function drawCollisionCircle(ctx, x, y, radius) {
