@@ -159,6 +159,21 @@ export function drawAsteroids(system, ctx) {
   }
 }
 
+/**
+ * @param {AsteroidSystem} system
+ * @param {CanvasRenderingContext2D} ctx
+ */
+export function drawAsteroidTimer(system, ctx) {
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.font = '24px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(
+    `${Math.ceil(system.spawner.spawnTicks / 1000)}`,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT - 12,
+  );
+}
+
 export class Asteroid {
   x = 0;
   y = 0;

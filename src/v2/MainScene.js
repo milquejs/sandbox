@@ -1,4 +1,4 @@
-import { ButtonBinding, InputContext, KeyCodes } from '@milquejs/milque';
+import { InputContext } from '@milquejs/milque';
 
 import * as Starfield from '../v1/Starfield';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
@@ -7,9 +7,8 @@ import * as Bullets from './Bullets';
 import * as Particles from './Particles';
 import * as Players from './Players';
 import * as PowerUps from './PowerUps';
-
-const INSTRUCTION_HINT_TEXT = '[ wasd_ ]';
-const FLASH_TIME_STEP = 0.1;
+import * as Score from './Score';
+import { INSTRUCTION_HINT_TEXT } from './Values';
 
 let SHOW_COLLISION = false;
 
@@ -17,14 +16,6 @@ export class MainScene {
   isFirstInput = true;
 
   level = 0;
-  score = 0;
-  highScore = Number(localStorage.getItem('highscore'));
-
-  flashScore = 0;
-  flashScoreDelta = 0;
-
-  flashHighScore = 0;
-  flashHighScoreDelta = 0;
 
   gamePause = true;
   showPlayer = true;
@@ -33,6 +24,7 @@ export class MainScene {
   hint = INSTRUCTION_HINT_TEXT;
 
   constructor() {
+    this.score = Score.init();
     this.players = Players.init();
     this.asteroids = Asteroids.init();
     this.bullets = Bullets.init();
@@ -101,10 +93,9 @@ export class MainScene {
       if (this.gameWait) {
         if (this.gameStart) {
           // Assets.BackgroundMusic.current.play();
-          this.score = 0;
-          this.flashScore = 1;
           this.level = 0;
           this.gameStart = false;
+          Score.onGameRestart(this.score);
           Players.onGameRestart(this.players);
           Asteroids.onGameRestart(this.asteroids);
           PowerUps.onGameRestart(this.powerUps);
@@ -142,47 +133,16 @@ export class MainScene {
     ctx.fillText(this.hint, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 32);
 
     // Draw score
-    if (this.flashScore > 0) {
-      ctx.fillStyle = `rgba(255, 255, 255, ${this.flashScore + 0.2})`;
-      this.flashScore -= FLASH_TIME_STEP;
-    } else {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    }
-    ctx.font = '48px sans-serif';
-    ctx.fillText(
-      '= ' + String(this.score).padStart(2, '0') + ' =',
-      SCREEN_WIDTH / 2,
-      SCREEN_HEIGHT / 2,
-    );
-    if (this.flashHighScore > 0) {
-      ctx.fillStyle = `rgba(255, 255, 255, ${this.flashHighScore + 0.2})`;
-      this.flashHighScore -= FLASH_TIME_STEP;
-    } else {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    }
-    ctx.font = '16px sans-serif';
-    ctx.fillText(
-      String(this.highScore).padStart(2, '0'),
-      SCREEN_WIDTH / 2,
-      SCREEN_HEIGHT / 2 + 32,
-    );
+    Score.drawScore(this.score, ctx);
 
     // Draw timer
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.font = '24px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(
-      `${Math.ceil(this.asteroids.spawner.spawnTicks / 1000)}`,
-      SCREEN_WIDTH,
-      SCREEN_HEIGHT - 12,
-    );
+    Asteroids.drawAsteroidTimer(this.asteroids, ctx);
 
+    // Draw entities
     Asteroids.drawAsteroids(this.asteroids, ctx);
     PowerUps.drawPowerUps(this.powerUps, ctx);
     Bullets.drawBullets(this.bullets, ctx);
     Particles.drawParticles(this.particles, ctx);
-
-    // Draw player
     if (this.showPlayer) {
       Players.drawPlayers(this.players, ctx);
     }

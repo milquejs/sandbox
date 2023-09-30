@@ -5,6 +5,7 @@ import {
 } from './Asteroids';
 import { MainScene } from './MainScene';
 import { explode } from './Particles';
+import { increaseScore } from './Score';
 import { drawCollisionCircle, withinRadius, wrapAround } from './Utils';
 
 export const BULLET_RADIUS = 2;
@@ -46,13 +47,7 @@ export function updateBullets(system, dt, scene) {
   for (let bullet of system.entities) {
     for (let asteroid of scene.asteroids.entities) {
       if (withinRadius(bullet, asteroid, asteroid.size)) {
-        scene.flashScore = 1;
-        scene.score++;
-        if (scene.score > scene.highScore) {
-          scene.flashHighScore = scene.score - scene.highScore;
-          scene.highScore = scene.score;
-          localStorage.setItem('highscore', `${scene.highScore}`);
-        }
+        increaseScore(scene.score);
         explode(
           scene.particles,
           asteroid.x,
