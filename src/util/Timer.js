@@ -1,11 +1,10 @@
 export class Timer {
-
   static now() {
     return performance.now();
   }
 
   /**
-   * @param {number} timeout 
+   * @param {number} timeout
    */
   constructor(timeout) {
     this.timeout = timeout;
