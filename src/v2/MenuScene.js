@@ -1,7 +1,10 @@
 import { InputContext } from '@milquejs/milque';
 import { PLAYER_DOWN, PLAYER_FIRE, PLAYER_UP } from './Players';
+import { Game } from '@/game/Game';
+import { MainScene } from './MainScene';
 
 export const FONT_SIZE = 32;
+export const FADE_MILLIS = 1_000;
 
 export class MenuScene {
 
@@ -9,6 +12,18 @@ export class MenuScene {
   buttons = [];
 
   selectIndex = 0;
+
+  fadeOut = {
+    start: false,
+    progress: 0,
+  };
+
+  /**
+   * @param {Game} game 
+   */
+  constructor(game) {
+    this.game = game;
+  }
 
   init() {
     let margin = 10;
@@ -23,6 +38,9 @@ export class MenuScene {
    * @param {InputContext} axb 
    */
   input(axb) {
+    if (this.fadeOut.start) {
+      return;
+    }
     if (PLAYER_UP.get(axb).pressed) {
       this.selectIndex--;
       if (this.selectIndex < 0) {
@@ -37,6 +55,7 @@ export class MenuScene {
     }
     if (PLAYER_FIRE.get(axb).pressed) {
       // Start transition!
+      this.fadeOut.start = true;
     }
   }
 
@@ -44,6 +63,18 @@ export class MenuScene {
    * @param {number} dt 
    */
   update(dt) {
+    if (this.fadeOut.start) {
+      if (this.fadeOut.progress < FADE_MILLIS) {
+        this.fadeOut.progress += dt;
+      } else {
+        // Finished! Move to the next scene!
+        this.game.stop().then(() => {
+          let scene = new MainScene();
+          this.game.init([scene], [scene]);
+        });
+      }
+      return;
+    }
     updateMenuScene(this, dt);
   }
 
@@ -63,6 +94,11 @@ export class MenuScene {
     ctx.restore();
 
     drawMenuScene(this, ctx);
+
+    if (this.fadeOut.start) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeOut.progress / FADE_MILLIS})`;
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
   }
 }
 
@@ -70,9 +106,7 @@ export class MenuScene {
  * @param {MenuScene} scene 
  * @param {number} dt 
  */
-export function updateMenuScene(scene, dt) {
-  
-}
+export function updateMenuScene(scene, dt) {}
 
 /**
  * @param {MenuScene} scene 

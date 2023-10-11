@@ -1,4 +1,4 @@
-import { InputContext } from '@milquejs/milque';
+import { ButtonBinding, InputContext, KeyCodes } from '@milquejs/milque';
 
 import * as Starfield from '../v1/Starfield';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../v1/Values';
@@ -23,6 +23,8 @@ export class MainScene {
   gameWait = true;
   hint = INSTRUCTION_HINT_TEXT;
 
+  showMenu = false;
+
   constructor() {
     this.score = Score.init();
     this.players = Players.init();
@@ -39,6 +41,10 @@ export class MainScene {
    * @param {number} dt
    */
   update(dt) {
+    if (this.showMenu) {
+      return;
+    }
+
     // NOTE: Ignore game pauses for particle updates
     Particles.updateParticles(this.particles, dt);
 
@@ -80,6 +86,7 @@ export class MainScene {
       return;
     }
     Players.registerInputs(axb);
+    axb.bindKeys(new ButtonBinding('menu', KeyCodes.ESCAPE));
     this.isFirstInput = false;
   }
 
@@ -88,6 +95,10 @@ export class MainScene {
    */
   input(axb) {
     this.firstInput(axb);
+
+    if (axb.isButtonPressed('menu')) {
+      this.showMenu = !this.showMenu;
+    }
 
     if (axb.isAnyButtonPressed()) {
       if (this.gameWait) {
@@ -145,6 +156,11 @@ export class MainScene {
     Particles.drawParticles(this.particles, ctx);
     if (this.showPlayer) {
       Players.drawPlayers(this.players, ctx);
+    }
+
+    if (this.showMenu) {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, 100, 100);
     }
   }
 }

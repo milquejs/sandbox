@@ -17,16 +17,20 @@ import { AnimationFrameDetail, InputContext } from '@milquejs/milque';
 
 export class Game {
   /**
-   * @param {Array<GameSystemLike>} systems
-   * @param {Array<GameRendererLike>} renderers
    * @param {RenderingContext} renderContext
    * @param {InputContext} inputContext
    */
-  constructor(systems, renderers, renderContext, inputContext) {
-    /** @private */
-    this.systems = systems;
-    /** @private */
-    this.renderers = renderers;
+  constructor(renderContext, inputContext) {
+    /**
+     * @private
+     * @type {Array<GameSystemLike>}
+     */
+    this.systems = [];
+    /**
+     * @private
+     * @type {Array<GameRendererLike>}
+     */
+    this.renderers = [];
 
     /** @private */
     this.renderContext = renderContext;
@@ -36,14 +40,22 @@ export class Game {
     this.run = this.run.bind(this);
   }
 
-  async init() {
-    for (let system of this.systems) {
-      if (!system.load) continue;
-      await system.load();
+  /**
+   * @param {Array<GameSystemLike>} systems 
+   * @param {Array<GameRendererLike>} renderers 
+   */
+  async init(systems, renderers) {
+    for (let system of systems) {
+      if (system.load) {
+        await system.load();
+      }
+      this.systems.push(system);
     }
-    for (let renderer of this.renderers) {
-      if (!renderer.prepare) continue;
-      await renderer.prepare(this.renderContext);
+    for (let renderer of renderers) {
+      if (renderer.prepare) {
+        await renderer.prepare(this.renderContext);
+      }
+      this.renderers.push(renderer);
     }
     for (let system of this.systems) {
       if (!system.init) continue;
@@ -69,20 +81,42 @@ export class Game {
   }
 
   async stop() {
-    for (let system of this.systems) {
+    let oldSystems = this.systems.slice();
+    let oldRenderers = this.renderers.slice();
+
+    for (let system of oldSystems) {
       if (!system.dead) continue;
       system.dead();
+
+      let i = this.systems.indexOf(system);
+      this.systems.splice(i, 1);
     }
+
     const renderContext = this.renderContext;
     let result = [];
-    for (let renderer of this.renderers) {
+    for (let renderer of oldRenderers) {
       if (!renderer.dispose) continue;
       result.push(renderer.dispose(renderContext));
+
+      let i = this.renderers.indexOf(renderer);
+      this.renderers.splice(i, 1);
     }
-    for (let system of this.systems) {
+
+    for (let system of oldSystems) {
       if (!system.unload) continue;
       result.push(system.unload());
     }
+
     await Promise.all(result);
+    this.systems.length = 0;
+    this.renderers.length = 0;
+  }
+
+  getRenderContext() {
+    return this.renderContext;
+  }
+
+  getInputContext() {
+    return this.inputContext;
   }
 }

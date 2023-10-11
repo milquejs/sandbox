@@ -15,16 +15,13 @@ export async function main() {
   });
   const loop = new AnimationFrameLoop();
 
-  const menuScene = new MenuScene();
-  const mainScene = new MainScene();
-
   const game = new Game(
-    [menuScene],
-    [menuScene],
     canvas.getContext('2d'),
     new InputContext(canvas),
   );
-  await game.init();
+  
+  const menuScene = new MenuScene(game);
+  await game.init([menuScene], [menuScene]);
 
   loop.start((e) => game.run(e.detail));
 }
