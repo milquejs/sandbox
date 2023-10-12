@@ -1,19 +1,15 @@
 import { AssetRef, ImageLoader } from '@milquejs/milque';
 
-import FILEPATH from './hand.png';
+import FILEPATH from './logo.png';
 
 export default new AssetRef(
-  'hand.png',
+  'logo.png',
   ImageLoader,
   {
     imageType: 'png',
     spriteWidth: 512,
     spriteHeight: 512,
-    spriteCount: 3,
+    spriteCount: 2,
   },
   FILEPATH,
 );
-
-export const FRAME_WIDTH = 512;
-export const FRAME_HEIGHT = 512;
-export const FRAME_COUNT = 3;

@@ -1,15 +1,15 @@
 import { AssetRef, ImageLoader } from '@milquejs/milque';
 
-import FILEPATH from './sheep.png';
+import FILEPATH from './splash_parts.png';
 
 export default new AssetRef(
-  'sheep.png',
+  'splash_parts.png',
   ImageLoader,
   {
     imageType: 'png',
-    spriteWidth: 128,
-    spriteHeight: 128,
-    spriteCount: 1,
+    spriteWidth: 256,
+    spriteHeight: 256,
+    spriteCount: 11,
   },
   FILEPATH,
 );

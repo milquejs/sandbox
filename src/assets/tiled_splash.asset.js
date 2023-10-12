@@ -1,15 +1,15 @@
 import { AssetRef, ImageLoader } from '@milquejs/milque';
 
-import FILEPATH from './button.png';
+import FILEPATH from './tiled_splash.png';
 
 export default new AssetRef(
-  'button.png',
+  'tiled_splash.png',
   ImageLoader,
   {
     imageType: 'png',
-    spriteWidth: 256,
-    spriteHeight: 128,
-    spriteCount: 4,
+    spriteWidth: 512,
+    spriteHeight: 512,
+    spriteCount: 1,
   },
   FILEPATH,
 );
