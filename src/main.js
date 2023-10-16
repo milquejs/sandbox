@@ -119,9 +119,9 @@ export async function main() {
     }
     */
 
-    const START_DATE = 'Oct 20';
-    const END_DATE = 'Oct 22';
-    const SHOWCASE_DATE = 'Nov 3';
+    const START_DATE = 'Nov 17';
+    const END_DATE = 'Nov 20';
+    const SHOWCASE_DATE = 'Dec 1';
 
     let x = 0;
     let y = 0;
@@ -130,32 +130,34 @@ export async function main() {
     ctx.textBaseline = 'top';
     ctx.textAlign = 'center';
 
-    ctx.font = '180px Arial';
+    ctx.font = '110px Arial';
     ctx.fillStyle = '#000000';
-    ctx.fillRect(380, 290, 1050, 90);
+    ctx.fillRect(650, 160, 650, 60);
 
     fill = '#FFFFFF';
-    drawShadowText(ctx, '#filmmakers', center.x - 250, top.y + 200, 10, 3, 3, fill);
-    ctx.fillText('group', center.x + 520, top.y + 200);
+    drawShadowText(ctx, '#filmmakers', center.x - 180, top.y + 100, 10, 3, 3, fill);
+    ctx.fillText('group', center.x + 310, top.y + 100);
 
-    ctx.font = '150px Arial';
-    ctx.fillText('invites you to...', center.x, top.y + 400);
+    ctx.font = '90px Arial';
+    ctx.fillText('invites you to...', center.x, top.y + 240);
 
     const FANCY_COLOR_A = '#8833DD';
     const FANCY_COLOR_B = '#FFAA00';
     
-    const fancyBgColor = ctx.createLinearGradient(0, 750, 20, 1000);
+    /*
+    const fancyBgColor = ctx.createLinearGradient(0, 400, 20, 1000);
     fancyBgColor.addColorStop(0, FANCY_COLOR_A);
     fancyBgColor.addColorStop(1, FANCY_COLOR_B);
+    */
 
-    ctx.font = '300px Georgia';
-    drawFancyText(ctx, '2023 Fall', center.x, 650, 10, 6, 6, fancyBgColor);
-
-    const fancyBgColor2 = ctx.createLinearGradient(0, 1000, 20, 1350);
-    fancyBgColor2.addColorStop(0, FANCY_COLOR_A);
-    fancyBgColor2.addColorStop(1, FANCY_COLOR_B);
     ctx.font = '400px Georgia';
-    drawFancyText(ctx, 'Film Jam!', center.x, 1000, 10, 6, 6, fancyBgColor2);
+    drawFancyText(ctx, '2023 Fall', center.x, 350, 10, 6, 6, FANCY_COLOR_B);
+
+    const fancyBgColor2 = ctx.createLinearGradient(0, 900, 20, 1200);
+    fancyBgColor2.addColorStop(0, FANCY_COLOR_B);
+    fancyBgColor2.addColorStop(1, FANCY_COLOR_A);
+    ctx.font = '400px Georgia';
+    drawFancyText(ctx, 'Film Jam!', center.x, 750, 10, 6, 6, fancyBgColor2);
 
     // ========== CENTER ==========
 
@@ -165,29 +167,29 @@ export async function main() {
     if (!logo) {
       return;
     }
-    tia.spr(ctx, logo, 0, center.x + 100, center.y - 300, logoW, logoH);
-    tia.spr(ctx, logo, 1, center.x + 600, center.y - 300, logoW, logoH);
+    tia.spr(ctx, logo, 0, center.x + 100, center.y - 500, logoW, logoH);
+    tia.spr(ctx, logo, 1, center.x + 600, center.y - 500, logoW, logoH);
 
     const leftMargin = 200;
-    ctx.font = '150px Arial';
+    ctx.font = '130px Arial';
     ctx.textAlign = 'left';
 
     x = left.x + leftMargin;
-    y = left.y - 200;
+    y = left.y - 450;
     ctx.fillStyle = '#000000';
     ctx.fillRect(x - 50, y + 60, 1000, 100);
     fill = '#FFFFFF';
     drawShadowText(ctx, 'Start: ' + START_DATE, x, y, 5, 5, 5, fill);
 
     x = left.x + leftMargin;
-    y = left.y;
+    y = left.y - 250;
     ctx.fillStyle = '#000000';
     ctx.fillRect(x - 50, y + 60, 1000, 100);
     fill = '#FFFFFF';
     drawShadowText(ctx, 'End:  ' + END_DATE, x, y, 5, 5, 5, fill);
 
     x = left.x + leftMargin;
-    y = left.y + 200;
+    y = left.y - 50;
     ctx.fillStyle = '#000000';
     ctx.fillRect(x - 50, y + 60, 1400, 100);
     fill = '#FFFFFF';
@@ -195,26 +197,39 @@ export async function main() {
 
     ctx.textAlign = 'center';
     x = center.x;
-    y = center.y + 550;
+    y = center.y + 220;
     fill = '#FFFFFF';
-    ctx.font = '180px Arial';
-    drawShadowText(ctx, 'Visit our wiki for more info:', x, y, 5, 5, 5, fill);
-    ctx.font = '100px Arial';
-    ctx.fillText('https://w.amazon.com/bin/view/Filmmakers', x, y + 250);
+    ctx.font = '140px Arial';
+    drawShadowText(ctx, 'Visit our wiki for more info:', x, y, 5, 5, 5, FANCY_COLOR_B);
+    ctx.font = '120px Arial';
+    drawShadowText(ctx, 'w.amazon.com/bin/view/Filmmakers', x, y + 200, 3, 5, 5, fill);
 
     // ========== BOTTOM ==========
 
+    let fillTitle = FANCY_COLOR_B;
     ctx.textAlign = 'left';
-    ctx.font = '100px Arial';
-    x = left.x + leftMargin;
-    y = Math.max(center.y + 1100, bottom.y - 1600);
-    drawShadowText(ctx, 'What\'s a Film Jam?', x, y, 5, 5, 5, fill);
+    ctx.font = '80px Arial';
+    x = left.x + leftMargin - 50;
+    y = Math.max(center.y + 650, bottom.y - 1600);
+    drawShadowText(ctx, 'What\'s a Film Jam?', x, y, 3, 5, 5, fillTitle);
+    ctx.font = '60px Arial';
+    drawShadowText(ctx, 'An event where participants get together and create a short film from start', x, y += 120, 3, 2, 2, fill);
+    drawShadowText(ctx, 'to finish in just 48-hours. Compete in teams or alone and have fun exploring', x, y += 80, 3, 2, 2, fill);
+    drawShadowText(ctx, 'and learning the entire filmmaking process!', x, y += 80, 3, 2, 2, fill);
+    y = Math.max(center.y + 700, bottom.y - 1600);
 
-    y += 200; // 500
-    drawShadowText(ctx, 'What if I don\'t how to make a movie?', x, y, 5, 5, 5, fill);
+    ctx.font = '80px Arial';
+    y += 370; // 500
+    drawShadowText(ctx, 'What if I don\'t how to make a movie?', x, y, 3, 5, 5, fillTitle);
+    ctx.font = '60px Arial';
+    drawShadowText(ctx, 'That\'s fine! Join a team and ask questions! Reach out on the channel and', x, y + 120, 3, 2, 2, fill);
+    drawShadowText(ctx, 'we can all learn as we work together!', x, y + 200, 3, 2, 2, fill);
 
-    y += 200; // 500
-    drawShadowText(ctx, 'Who are the #filmmakers group?', x, y, 5, 5, 5, fill);
+    ctx.font = '80px Arial';
+    y += 340; // 500
+    drawShadowText(ctx, 'Who are the #filmmakers group?', x, y, 3, 5, 5, fillTitle);
+    ctx.font = '60px Arial';
+    drawShadowText(ctx, 'A group of film-passionate Amazonians :) Join us!', x, y + 120, 3, 2, 2, fill);
   });
 }
 
@@ -274,11 +289,18 @@ function drawNumberSign(ctx, x, y, w, h, mx, my) {
  * @param {number} dx
  * @param {number} dy
  * @param {string|CanvasGradient|CanvasPattern} fill
+ * @param {boolean} [blur]
  */
-function drawShadowText(ctx, text, x, y, depth, dx, dy, fill) {
+function drawShadowText(ctx, text, x, y, depth, dx, dy, fill, blur = true) {
   ctx.fillStyle = '#000000';
+  if (blur) {
+    ctx.filter = 'blur(5px)';
+  }
   for(let i = 0; i < depth; ++i) {
     ctx.fillText(text, x + i * dx, y + i * dy);
+  }
+  if (blur) {
+  ctx.filter = 'none';
   }
   ctx.fillStyle = fill;
   ctx.fillText(text, x, y);
